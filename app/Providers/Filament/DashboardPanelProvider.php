@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Pages\CustomLogin;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -21,7 +22,6 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class DashboardPanelProvider extends PanelProvider
 {
-
     public function panel(Panel $panel): Panel
     {
         return $panel
@@ -29,8 +29,9 @@ class DashboardPanelProvider extends PanelProvider
             ->id('dashboard')
             ->path('dashboard')
             ->sidebarWidth('15rem')
-    	    ->darkMode(false)
-            ->login()
+            ->brandName('InvenAguas')
+            ->darkMode(false)
+            ->login(CustomLogin::class)
             ->colors([
                 // 'primary' => Color::Amber,
                 'primary' => '#0062cc',

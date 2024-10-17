@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\EntradaResource\Pages;
 use App\Models\Entrada;
+use App\Models\Material;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Group;
@@ -12,6 +13,8 @@ use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
@@ -25,9 +28,10 @@ class EntradaResource extends Resource
 
     protected static ?string $navigationLabel = 'Entrada de Material';
 
+    public static string $cantidadMaterial = '';
+
     public static function form(Form $form): Form
     {
-        $cantidad = '';
 
         return $form
             ->schema([
@@ -62,6 +66,11 @@ class EntradaResource extends Resource
                                     }),
 
                             ])->columns(2),
+                        Section::make()
+                            ->schema([
+
+                            ]),
+
                     ]),
                 Group::make()
                     ->schema([
@@ -69,7 +78,7 @@ class EntradaResource extends Resource
                             ->schema([
 
                                 Repeater::make('articulos')
-                                    ->label('Materiales')
+                                    ->label('')
                                     ->relationship('articulos')
                                     ->schema([
                                         Select::make('material_id')
@@ -82,22 +91,35 @@ class EntradaResource extends Resource
                                                     ->modalHeading('Crear Material')
                                                     ->modalSubmitActionLabel('Crear Material')
                                                     ->modalWidth('sm')
-                                                    ->action(function (array $data) {
-                                                        $cantidad = $data['cantidad'];
+                                                    ->action(function (array $data, Set $set) {
+                                                        $material = Material::create([
+                                                            'descripcion' => $data['descripcion'],
+                                                            'depositos_id' => $data['depositos_id'],
+                                                            'categorias_id' => $data['categorias_id'],
+                                                            'alerta' => $data['alerta'],
+                                                        ]);
+                                                        static::$cantidadMaterial = $data['cantidad'];
+
+                                                        $set('material_id', $material->id);
+
+                                                        $set('cantidad', static::$cantidadMaterial);
+
                                                     });
                                             }),
+
                                         TextInput::make('cantidad')
                                             ->numeric()
                                             ->required()
                                             ->minValue(1)
+                                            ->afterStateHydrated(function (Get $get, Set $set) {
+                                                if (! $get('cantidad') && $get('material_id')) {
+                                                    $set('cantidad', static::$cantidadMaterial);
+                                                }
+                                            })
                                             ->columns(1),
-                                        //    Select::make('material_id')
-                                        //     ->searchable()
-                                        //     ->relationship('material', 'deposito')
-                                        //     ->required()
-                                        //     ->columnSpan(1)
                                     ])
-                                    ->addActionLabel('Agregar otro material'),
+                                    ->addActionLabel('Agregar otro material')
+                                    ->live(),
                             ]),
                     ]),
 

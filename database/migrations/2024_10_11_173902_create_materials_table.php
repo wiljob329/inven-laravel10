@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('materials', function (Blueprint $table) {
             $table->id();
             $table->string('descripcion');
-            $table->integer('cantidad');
+            $table->integer('cantidad')->nullable();
             $table->foreignId('depositos_id')->constrained('depositos')->cascadeOnDelete();
             $table->foreignId('categorias_id')->constrained('categorias')->cascadeOnDelete();
             $table->integer('alerta')->nullable();
