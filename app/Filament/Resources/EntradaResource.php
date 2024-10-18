@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\EntradaResource\Pages;
+use App\Models\Deposito;
 use App\Models\Entrada;
 use App\Models\Material;
 use Filament\Forms\Components\Actions\Action;
@@ -12,6 +13,7 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\View;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
@@ -68,59 +70,61 @@ class EntradaResource extends Resource
                             ])->columns(2),
                         Section::make()
                             ->schema([
-
+                                View::make('filament.resources.entrada-resource.tables.materials-table'),
                             ]),
 
                     ]),
                 Group::make()
                     ->schema([
-                        Section::make('Seleccion de materiales')
+                        Section::make('Materiales')
                             ->schema([
 
-                                Repeater::make('articulos')
-                                    ->label('')
-                                    ->relationship('articulos')
-                                    ->schema([
-                                        Select::make('material_id')
-                                            ->searchable()
-                                            ->relationship('material', 'descripcion')
-                                            ->required()
-                                            ->createOptionForm(static::getMaterialFormSchema())
-                                            ->createOptionAction(function (Action $action) {
-                                                return $action
-                                                    ->modalHeading('Crear Material')
-                                                    ->modalSubmitActionLabel('Crear Material')
-                                                    ->modalWidth('sm')
-                                                    ->action(function (array $data, Set $set) {
-                                                        $material = Material::create([
-                                                            'descripcion' => $data['descripcion'],
-                                                            'depositos_id' => $data['depositos_id'],
-                                                            'categorias_id' => $data['categorias_id'],
-                                                            'alerta' => $data['alerta'],
-                                                        ]);
-                                                        static::$cantidadMaterial = $data['cantidad'];
+                                // Repeater::make('articulo_temporal')
+                                // ->label('')
+                                // ->relationship('articulos')
+                                // ->schema([
+                                Select::make('material_id')
+                                    ->label('Material')
+                                    ->searchable()
+                                    ->relationship('articulos.material', 'descripcion')
+                                    ->createOptionForm(static::getMaterialFormSchema())
+                                    ->createOptionAction(function (Action $action) {
+                                        return $action
+                                            ->modalHeading('Crear Material')
+                                            ->modalSubmitActionLabel('Crear Material')
+                                            ->modalWidth('sm')
+                                            ->action(function (array $data, Set $set) {
+                                                $material = Material::create([
+                                                    'descripcion' => $data['descripcion'],
+                                                    'depositos_id' => $data['depositos_id'],
+                                                    'categorias_id' => $data['categorias_id'],
+                                                    'alerta' => $data['alerta'],
+                                                ]);
+                                                static::$cantidadMaterial = $data['cantidad'];
 
-                                                        $set('material_id', $material->id);
+                                                $set('material_id', $material->id);
 
-                                                        $set('cantidad', static::$cantidadMaterial);
+                                                $set('cantidad', static::$cantidadMaterial);
 
-                                                    });
-                                            }),
+                                            });
+                                    }),
 
-                                        TextInput::make('cantidad')
-                                            ->numeric()
-                                            ->required()
-                                            ->minValue(1)
-                                            ->afterStateHydrated(function (Get $get, Set $set) {
-                                                if (! $get('cantidad') && $get('material_id')) {
-                                                    $set('cantidad', static::$cantidadMaterial);
-                                                }
-                                            })
-                                            ->columns(1),
-                                    ])
-                                    ->addActionLabel('Agregar otro material')
-                                    ->live(),
+                                TextInput::make('cantidad')
+                                    ->numeric()
+                                    ->minValue(1)
+                                    ->afterStateHydrated(function (Get $get, Set $set) {
+                                        if (! $get('cantidad') && $get('material_id')) {
+                                            $set('cantidad', static::$cantidadMaterial);
+                                        }
+                                    })
+                                    ->columns(1),
+                                View::make('filament.pages.custom-button'),
                             ]),
+                        // ->addActionLabel('Agregar material')
+                        // ->live(),
+                        // ->maxItems(1),
+
+                        // ]),
                     ]),
 
             ]);
@@ -179,6 +183,7 @@ class EntradaResource extends Resource
 
             Select::make('depositos_id')
                 ->relationship('deposito', 'name')
+                ->options(Deposito::all()->pluck('name', 'id'))
                 ->searchable()
                 ->required()
                 ->createOptionForm([

@@ -8,7 +8,14 @@ use Filament\Resources\Pages\EditRecord;
 
 class EditEntrada extends EditRecord
 {
+    public $materiales = [];
+
     protected static string $resource = EntradaResource::class;
+
+    public function getMaterialesTabla()
+    {
+        return $this->materiales;
+    }
 
     protected function getHeaderActions(): array
     {
