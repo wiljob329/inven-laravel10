@@ -3,10 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\MaterialResource\Pages;
-use App\Filament\Resources\MaterialResource\RelationManagers;
-use App\Models\Deposito;
 use App\Models\Material;
-use Filament\Forms;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Section;
@@ -17,16 +14,13 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class MaterialResource extends Resource
 {
     protected static ?string $model = Material::class;
 
-
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-    
+
     protected static ?string $navigationLabel = 'Inventario de Material';
 
     public static function form(Form $form): Form
@@ -37,7 +31,8 @@ class MaterialResource extends Resource
                     ->schema([
                         Section::make()
                             ->schema([
-                                TextInput::make('descripcion'),
+                                TextInput::make('descripcion')
+                                    ->required(),
                                 TextInput::make('cantidad')->numeric(),
                                 Select::make('depositos_id')
                                     ->relationship('deposito', 'name')
@@ -46,9 +41,9 @@ class MaterialResource extends Resource
                                     ->createOptionForm([
                                         TextInput::make('name')
                                             ->label('Nombre Deposito')
-                                            ->required()
+                                            ->required(),
                                     ])
-                                    ->createOptionAction(function (Action $action){
+                                    ->createOptionAction(function (Action $action) {
                                         return $action
                                             ->modalHeading('Crear Deposito')
                                             ->modalSubmitActionLabel('Crear Deposito')
@@ -61,9 +56,9 @@ class MaterialResource extends Resource
                                     ->createOptionForm([
                                         TextInput::make('name')
                                             ->label('Nombre Categoria')
-                                            ->required()
+                                            ->required(),
                                     ])
-                                    ->createOptionAction(function (Action $action){
+                                    ->createOptionAction(function (Action $action) {
                                         return $action
                                             ->modalHeading('Crear Categoria')
                                             ->modalSubmitActionLabel('Crear Categoria')
@@ -71,12 +66,13 @@ class MaterialResource extends Resource
                                     }),
                                 TextInput::make('alerta')
                                     ->label('Numero minimo permitido')
+                                    ->required()
                                     ->numeric(),
-                                
+
                             ])
-                            ->columns(3)
+                            ->columns(3),
                     ])
-                    ->columnSpan(['lg' => 2])
+                    ->columnSpan(['lg' => 2]),
             ]);
     }
 

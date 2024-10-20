@@ -35,93 +35,94 @@ class EntradaResource extends Resource
 
         return $form
             ->schema([
-                Group::make()
+                // Group::make()
+                //     ->schema([
+                Section::make()
                     ->schema([
-                        Section::make()
-                            ->schema([
-                                TextInput::make('codigo_nota_entrega')
-                                    ->label('Codigo de entrega')
+                        TextInput::make('codigo_nota_entrega')
+                            ->label('Codigo de entrega')
+                            ->autofocus()
+                            ->unique()
+                            ->validationMessages([
+                                'unique' => 'El codigo ya existe',
+                            ])
+                            ->required(),
+                        DatePicker::make('fecha')
+                            ->required()
+                            ->native(false)
+                            ->suffixIcon('heroicon-o-calendar')
+                            ->closeOnDateSelection()
+                            ->displayFormat('d/m/Y'),
+                        TextInput::make('recibido_por')->required(),
+                        Select::make('proveedors_id')
+                            ->relationship('proveedor', 'name')
+                            ->searchable()
+                            ->required()
+                            ->createOptionForm([
+                                TextInput::make('name')
+                                    ->label('Nombre del Proveedor')
                                     ->required(),
-                                DatePicker::make('fecha')
-                                    ->required()
-                                    ->native(false)
-                                    ->suffixIcon('heroicon-o-calendar')
-                                    ->closeOnDateSelection()
-                                    ->displayFormat('d/m/Y'),
-                                TextInput::make('recibido_por')->required(),
-                                Select::make('proveedors_id')
-                                    ->relationship('proveedor', 'name')
+                            ])
+                            ->createOptionAction(function (Action $action) {
+                                return $action
+                                    ->modalHeading('Crear Proveedor')
+                                    ->modalSubmitActionLabel('Crear Proveedor')
+                                    ->modalWidth('sm');
+                            }),
+
+                    ])->columns(4),
+
+                // ])->columns('full'),
+                // Group::make()
+                //     ->schema([
+                Section::make('Seleccion de materiales')
+                    ->schema([
+
+                        Repeater::make('articulos')
+                            ->label('')
+                            ->relationship('articulos')
+                            ->schema([
+                                Select::make('material_id')
                                     ->searchable()
+                                    ->relationship('material', 'descripcion')
                                     ->required()
-                                    ->createOptionForm([
-                                        TextInput::make('name')
-                                            ->label('Nombre del Proveedor')
-                                            ->required(),
-                                    ])
+                                    ->createOptionForm(static::getMaterialFormSchema())
                                     ->createOptionAction(function (Action $action) {
                                         return $action
-                                            ->modalHeading('Crear Proveedor')
-                                            ->modalSubmitActionLabel('Crear Proveedor')
-                                            ->modalWidth('sm');
-                                    }),
+                                            ->modalHeading('Crear Material')
+                                            ->modalSubmitActionLabel('Crear Material')
+                                            ->modalWidth('sm')
+                                            ->action(function (array $data, Set $set) {
+                                                $material = Material::create([
+                                                    'descripcion' => $data['descripcion'],
+                                                    'depositos_id' => $data['depositos_id'],
+                                                    'categorias_id' => $data['categorias_id'],
+                                                    'alerta' => $data['alerta'],
+                                                ]);
+                                                static::$cantidadMaterial = $data['cantidad'];
 
-                            ])->columns(2),
-                        Section::make()
-                            ->schema([
+                                                $set('material_id', $material->id);
 
-                            ]),
+                                                $set('cantidad', static::$cantidadMaterial);
 
+                                            });
+                                    })->columnSpan(1),
+
+                                TextInput::make('cantidad')
+                                    ->numeric()
+                                    ->required()
+                                    ->minValue(1)
+                                    ->afterStateHydrated(function (Get $get, Set $set) {
+                                        if (! $get('cantidad') && $get('material_id')) {
+                                            $set('cantidad', static::$cantidadMaterial);
+                                        }
+                                    })->columnSpan(1),
+                            ])
+                            ->addActionLabel('Agregar otro material')
+                            ->live()
+                            ->columns(2),
                     ]),
-                Group::make()
-                    ->schema([
-                        Section::make('Seleccion de materiales')
-                            ->schema([
-
-                                Repeater::make('articulos')
-                                    ->label('')
-                                    ->relationship('articulos')
-                                    ->schema([
-                                        Select::make('material_id')
-                                            ->searchable()
-                                            ->relationship('material', 'descripcion')
-                                            ->required()
-                                            ->createOptionForm(static::getMaterialFormSchema())
-                                            ->createOptionAction(function (Action $action) {
-                                                return $action
-                                                    ->modalHeading('Crear Material')
-                                                    ->modalSubmitActionLabel('Crear Material')
-                                                    ->modalWidth('sm')
-                                                    ->action(function (array $data, Set $set) {
-                                                        $material = Material::create([
-                                                            'descripcion' => $data['descripcion'],
-                                                            'depositos_id' => $data['depositos_id'],
-                                                            'categorias_id' => $data['categorias_id'],
-                                                            'alerta' => $data['alerta'],
-                                                        ]);
-                                                        static::$cantidadMaterial = $data['cantidad'];
-
-                                                        $set('material_id', $material->id);
-
-                                                        $set('cantidad', static::$cantidadMaterial);
-
-                                                    });
-                                            }),
-
-                                        TextInput::make('cantidad')
-                                            ->numeric()
-                                            ->required()
-                                            ->minValue(1)
-                                            ->afterStateHydrated(function (Get $get, Set $set) {
-                                                if (! $get('cantidad') && $get('material_id')) {
-                                                    $set('cantidad', static::$cantidadMaterial);
-                                                }
-                                            })
-                                            ->columns(1),
-                                    ])
-                                    ->addActionLabel('Agregar otro material')
-                                    ->live(),
-                            ]),
-                    ]),
+                // ]),
 
             ]);
     }
