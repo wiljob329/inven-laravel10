@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\EntradaResource\Pages;
 use App\Models\Entrada;
 use App\Models\Material;
+use App\Models\Deposito;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Group;
@@ -46,6 +47,7 @@ class EntradaResource extends Resource
                             ->validationMessages([
                                 'unique' => 'El codigo ya existe',
                             ])
+                            ->disabled(fn (string $operation) => $operation === 'edit' ? true : false)
                             ->required(),
                         DatePicker::make('fecha')
                             ->required()
@@ -180,6 +182,7 @@ class EntradaResource extends Resource
 
             Select::make('depositos_id')
                 ->relationship('deposito', 'name')
+                ->options(Deposito::all()->pluck('name', 'id'))
                 ->searchable()
                 ->required()
                 ->createOptionForm([

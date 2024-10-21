@@ -34,6 +34,7 @@ class MaterialesRelationManager extends RelationManager
             ])
             ->filters([
                 //
+
             ])
             ->headerActions([
                 Tables\Actions\CreateAction::make(),
@@ -49,5 +50,6 @@ class MaterialesRelationManager extends RelationManager
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
+            
     }
 }
