@@ -3,9 +3,9 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\EntradaResource\Pages;
+use App\Models\Deposito;
 use App\Models\Entrada;
 use App\Models\Material;
-use App\Models\Deposito;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Group;
@@ -41,13 +41,10 @@ class EntradaResource extends Resource
                 Section::make()
                     ->schema([
                         TextInput::make('codigo_nota_entrega')
+                            ->default(fn () => Entrada::getNextCode())
+                            ->disabled()
+                            ->dehydrated()
                             ->label('Codigo de entrega')
-                            ->autofocus()
-                            ->unique()
-                            ->validationMessages([
-                                'unique' => 'El codigo ya existe',
-                            ])
-                            ->disabled(fn (string $operation) => $operation === 'edit' ? true : false)
                             ->required(),
                         DatePicker::make('fecha')
                             ->required()

@@ -22,7 +22,7 @@ class CustomLogin extends Login
         if (app()->environment('local')) {
             $this->form->fill([
                 'name' => 'deposito',
-                'password' => 'deposito123',
+                'password' => 'deposito',
             ]);
         }
     }

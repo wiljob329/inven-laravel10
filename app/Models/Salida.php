@@ -9,7 +9,7 @@ class Salida extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['fecha', 'entregado_a', 'departmento', 'cedula', 'vehicle_placa'];
+    protected $fillable = ['fecha', 'entregado_a', 'departamento', 'destino', 'cedula', 'vehicle_placa'];
 
     public function articulos()
     {
