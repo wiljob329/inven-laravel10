@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\SalidaResource\Pages;
 use App\Models\Salida;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
@@ -14,6 +15,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Blade;
 
 class SalidaResource extends Resource
 {
@@ -85,7 +87,23 @@ class SalidaResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\EditAction::make(),
+                    Tables\Actions\Action::make('pdf')
+                        ->label('PDF')
+                        ->color('success')
+                        ->icon('heroicon-o-arrow-down-tray')
+                        ->action(function (Salida $record) {
+                            return response()
+                                ->streamDownload(function () use ($record) {
+                                    echo Pdf::loadHtml(
+                                        Blade::render('pdf', ['record' => $record])
+                                    )
+                                        ->setPaper('letter', 'landscape')
+                                        ->download();
+                                }, $record->number.'.pdf');
+                        }),
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
