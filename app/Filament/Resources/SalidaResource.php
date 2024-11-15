@@ -33,16 +33,26 @@ class SalidaResource extends Resource
                 Section::make()
                     ->schema([
                         DatePicker::make('fecha')
+                            ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
                             ->required()
                             ->native(false)
                             ->suffixIcon('heroicon-o-calendar')
                             ->closeOnDateSelection()
                             ->displayFormat('d/m/Y'),
-                        TextInput::make('entregado_a')->required(),
-                        TextInput::make('departamento')->required(),
-                        TextInput::make('destino')->required(),
-                        TextInput::make('cedula')->required(),
+                        TextInput::make('entregado_a')
+                            ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
+                            ->required(),
+                        TextInput::make('departamento')
+                            ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
+                            ->required(),
+                        TextInput::make('destino')
+                            ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
+                            ->required(),
+                        TextInput::make('cedula')
+                            ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
+                            ->required(),
                         TextInput::make('vehicle_placa')
+                            ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
                             ->label('Placa del Vehiculo')
                             ->required(),
 
@@ -51,14 +61,17 @@ class SalidaResource extends Resource
                     ->schema([
                         Repeater::make('articulos')
                             ->label('')
+                            ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
                             ->relationship('articulos')
                             ->schema([
                                 Select::make('material_id')
                                     ->searchable()
+                                    ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
                                     ->relationship('material', 'descripcion')
                                     ->required()
                                     ->columnSpan(1),
                                 TextInput::make('cantidad')
+                                    ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
                                     ->numeric()
                                     ->required()
                                     ->minValue(1)

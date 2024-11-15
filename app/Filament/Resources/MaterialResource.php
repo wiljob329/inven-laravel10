@@ -32,9 +32,13 @@ class MaterialResource extends Resource
                         Section::make()
                             ->schema([
                                 TextInput::make('descripcion')
+                                    ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
                                     ->required(),
-                                TextInput::make('cantidad')->numeric(),
+                                TextInput::make('cantidad')
+                                    ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
+                                    ->numeric(),
                                 Select::make('depositos_id')
+                                    ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
                                     ->relationship('deposito', 'name')
                                     ->searchable()
                                     ->required()
@@ -50,6 +54,7 @@ class MaterialResource extends Resource
                                             ->modalWidth('sm');
                                     }),
                                 Select::make('categorias_id')
+                                    ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
                                     ->relationship('categoria', 'name')
                                     ->searchable()
                                     ->required()
@@ -65,6 +70,7 @@ class MaterialResource extends Resource
                                             ->modalWidth('sm');
                                     }),
                                 TextInput::make('alerta')
+                                    ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
                                     ->label('Numero minimo permitido')
                                     ->required()
                                     ->numeric(),

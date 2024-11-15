@@ -14,7 +14,7 @@
         }
 
         .fontSize {
-            font-size: .6em;
+            font-size: .8em;
         }
 
         .lineh {
@@ -105,6 +105,15 @@
         <tr>
             <td colspan="10" class="wobt">PARA SER USADO EN:</td>
         </tr>
+        <tr class="space" style="height: 50px">
+            <td colspan="10"></td>
+        </tr>
+        <tr class="space" style="height: 10px">
+            <td colspan="10"></td>
+        </tr>
+        <tr class="space" style="height: 10px">
+            <td colspan="10"></td>
+        </tr>
         <tr class="space" style="height: 10px">
             <td colspan="10"></td>
         </tr>
@@ -156,12 +165,28 @@
             <td colspan="10"></td>
         </tr>
         <tr class="space">
-            <td colspan="10" class="tac fontSize"><span class="fontW">Nota:</span> EL RECEPTOR DE ESTE MATERIAL ASUME
+            <td colspan="10" class="tac fontSize"><span class="fontW">Nota:</span> EL RECEPTOR DE ESTE MATERIAL
+                ASUME
                 LA
                 RESPONSABILIDAD Y
                 CUSTODIA DE
                 AQUELLOS BIENES QUE TENGAN CONDICIÓN DE ACTIVO FIJO HASTA QUE SE LE ASIGNE UN CUSTODIO DEFINITIVO AL
                 MISMO.</td>
+        </tr>
+        <tr class="space" style="height: 10px">
+            <td colspan="10"></td>
+        </tr>
+        <tr class="space" style="height: 10px">
+            <td colspan="10"></td>
+        </tr>
+        <tr class="space" style="height: 10px">
+            <td colspan="10"></td>
+        </tr>
+        <tr class="space" style="height: 10px">
+            <td colspan="10"></td>
+        </tr>
+        <tr class="space" style="height: 10px">
+            <td colspan="10"></td>
         </tr>
         <tr class="space" style="height: 10px">
             <td colspan="10"></td>

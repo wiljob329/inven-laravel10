@@ -51,9 +51,13 @@ class EntradaResource extends Resource
                             ->native(false)
                             ->suffixIcon('heroicon-o-calendar')
                             ->closeOnDateSelection()
-                            ->displayFormat('d/m/Y'),
-                        TextInput::make('recibido_por')->required(),
+                            ->displayFormat('d/m/Y')
+                            ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito')),
+                        TextInput::make('recibido_por')
+                            ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
+                            ->required(),
                         Select::make('proveedors_id')
+                            ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
                             ->relationship('proveedor', 'name')
                             ->searchable()
                             ->required()
@@ -78,10 +82,12 @@ class EntradaResource extends Resource
                     ->schema([
 
                         Repeater::make('articulos')
+                            ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
                             ->label('')
                             ->relationship('articulos')
                             ->schema([
                                 Select::make('material_id')
+                                    ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
                                     ->searchable()
                                     ->relationship('material', 'descripcion')
                                     ->required()
@@ -108,6 +114,7 @@ class EntradaResource extends Resource
                                     })->columnSpan(1),
 
                                 TextInput::make('cantidad')
+                                    ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
                                     ->numeric()
                                     ->required()
                                     ->minValue(1)
