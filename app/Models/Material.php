@@ -9,7 +9,7 @@ class Material extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['descripcion', 'cantidad', 'depositos_id', 'categorias_id', 'alerta'];
+    protected $fillable = ['descripcion', 'cantidad', 'depositos_id', 'categorias_id', 'alerta', 'unidad_medidas_id'];
 
     public function deposito()
     {
@@ -29,5 +29,10 @@ class Material extends Model
     public function articuloSalidas()
     {
         return $this->hasMany(ArticuloSalida::class);
+    }
+
+    public function unidad()
+    {
+        return $this->belongsTo(UnidadMedidas::class);
     }
 }

@@ -1,0 +1,11 @@
+.alerta {
+    background-color: #d63638 !important;
+}
+
+.alerta:hover {
+    background-color: #e65054 !important;
+}
+
+.alerta .fi-ta-text-item-label {
+    color: #f6f7f7;
+}

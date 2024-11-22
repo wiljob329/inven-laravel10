@@ -39,6 +39,7 @@ class SalidaResource extends Resource
                             ->suffixIcon('heroicon-o-calendar')
                             ->closeOnDateSelection()
                             ->displayFormat('d/m/Y'),
+<<<<<<< HEAD
                         TextInput::make('entregado_a')
                             ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
                             ->required(),
@@ -51,6 +52,11 @@ class SalidaResource extends Resource
                         TextInput::make('cedula')
                             ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
                             ->required(),
+=======
+                        TextInput::make('departamento')->required(),
+                        TextInput::make('destino')->required(),
+                        TextInput::make('cedula')->required(),
+>>>>>>> testExport
                         TextInput::make('vehicle_placa')
                             ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
                             ->label('Placa del Vehiculo')
