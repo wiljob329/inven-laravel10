@@ -6,6 +6,8 @@ use App\Models\ArticuloEntrada;
 use App\Models\ArticuloSalida;
 use App\Observers\ArticuloEntradaObserver;
 use App\Observers\ArticuloSalidaObserver;
+use Filament\Support\Assets\Css;
+use Filament\Support\Facades\FilamentAsset;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -26,5 +28,8 @@ class AppServiceProvider extends ServiceProvider
         //
         ArticuloEntrada::observe(ArticuloEntradaObserver::class);
         ArticuloSalida::observe(ArticuloSalidaObserver::class);
+        FilamentAsset::register([
+            Css::make('app', __DIR__.'/css/app'),
+        ]);
     }
 }

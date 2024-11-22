@@ -81,11 +81,14 @@ class MaterialResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('descripcion')->searchable()->toggleable(),
-                TextColumn::make('cantidad'),
-                TextColumn::make('deposito.name'),
-                TextColumn::make('categoria.name'),
-                TextColumn::make('alerta'),
+                TextColumn::make('cantidad')->toggleable()->searchable(),
+                TextColumn::make('deposito.name')->toggleable()->searchable(),
+                TextColumn::make('categoria.name')->searchable(),
+                TextColumn::make('alerta')->toggleable(),
             ])
+            ->recordClasses(function ($record) {
+                return $record->cantidad <= $record->alerta ? 'alerta' : null;
+            })
             ->filters([
                 //
             ])

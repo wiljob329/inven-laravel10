@@ -38,7 +38,6 @@ class SalidaResource extends Resource
                             ->suffixIcon('heroicon-o-calendar')
                             ->closeOnDateSelection()
                             ->displayFormat('d/m/Y'),
-                        TextInput::make('entregado_a')->required(),
                         TextInput::make('departamento')->required(),
                         TextInput::make('destino')->required(),
                         TextInput::make('cedula')->required(),
