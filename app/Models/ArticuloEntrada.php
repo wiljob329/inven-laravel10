@@ -9,7 +9,7 @@ class ArticuloEntrada extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['entrada_id', 'material_id', 'cantidad'];
+    protected $fillable = ['entrada_id', 'material_id', 'cantidad', 'unidad_medidas_id'];
 
     public function entrada()
     {
@@ -19,5 +19,10 @@ class ArticuloEntrada extends Model
     public function material()
     {
         return $this->belongsTo(Material::class, 'material_id');
+    }
+
+    public function unidad_medidas()
+    {
+        return $this->belongsTo(UnidadMedidas::class, 'unidad_medidas_id');
     }
 }

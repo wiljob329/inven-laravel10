@@ -11,13 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('solicitante', function (Blueprint $table) {
-            $table->id();
-            $table->string('nombre');
-            $table->string('cargo')->nullable();
-            $table->string('gerencia')->nullable();
-            $table->string('cedula')->nullable();
-            $table->timestamps();
+        Schema::table('salidas', function (Blueprint $table) {
+            //
+            $table->foreignId('vehiculos_id')->constrained('vehiculos');
         });
     }
 
@@ -26,6 +22,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('solicitante');
+        Schema::table('salidas', function (Blueprint $table) {
+            //
+            $table->dropForeign(['vehiculos_id']);
+            $table->dropColumn('vehiculos_id');
+        });
     }
 };

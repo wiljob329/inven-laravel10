@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('salidas', function (Blueprint $table) {
+        Schema::table('articulo_entradas', function (Blueprint $table) {
             //
-            $table->string('serial');
+            $table->foreignId('unidad_medidas_id')->constrained('unidad_medidas')->cascadeOnDelete();
         });
     }
 
@@ -22,9 +22,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('salidas', function (Blueprint $table) {
+        Schema::table('articulo_entradas', function (Blueprint $table) {
             //
-            $table->dropColumn('serial');
+            $table->dropForeign(['unidad_medidas_id']);
+            $table->dropColumn('unidad_medidas_id');
         });
     }
 };

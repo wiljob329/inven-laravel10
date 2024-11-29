@@ -6,17 +6,19 @@ use App\Filament\Resources\EntradaResource\Pages;
 use App\Models\Deposito;
 use App\Models\Entrada;
 use App\Models\Material;
+use App\Models\UnidadMedidas;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Resources\Resource;
+use Filament\Support\Enums\MaxWidth;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -29,15 +31,15 @@ class EntradaResource extends Resource
 
     protected static ?string $navigationLabel = 'Entrada de Material';
 
-    public static string $cantidadMaterial = '';
+    public static ?string $cantidadMaterial = '';
+
+    public static ?int $unidadMedida = 0;
 
     public static function form(Form $form): Form
     {
 
         return $form
             ->schema([
-                // Group::make()
-                //     ->schema([
                 Section::make()
                     ->schema([
                         TextInput::make('codigo_nota_entrega')
@@ -54,7 +56,9 @@ class EntradaResource extends Resource
                             ->displayFormat('d/m/Y')
                             ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito')),
                         TextInput::make('recibido_por')
-                            ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
+                            ->default(auth()->user()->name)
+                            ->disabled()
+                            ->dehydrated()
                             ->required(),
                         Select::make('proveedors_id')
                             ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
@@ -64,6 +68,9 @@ class EntradaResource extends Resource
                             ->createOptionForm([
                                 TextInput::make('name')
                                     ->label('Nombre del Proveedor')
+                                    ->required(),
+                                TextInput::make('rif')
+                                    ->label('Rif del Proveedor')
                                     ->required(),
                             ])
                             ->createOptionAction(function (Action $action) {
@@ -75,9 +82,6 @@ class EntradaResource extends Resource
 
                     ])->columns(4),
 
-                // ])->columns('full'),
-                // Group::make()
-                //     ->schema([
                 Section::make('Seleccion de materiales')
                     ->schema([
 
@@ -87,7 +91,6 @@ class EntradaResource extends Resource
                             ->relationship('articulos')
                             ->schema([
                                 Select::make('material_id')
-                                    ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
                                     ->searchable()
                                     ->relationship('material', 'descripcion')
                                     ->required()
@@ -96,23 +99,48 @@ class EntradaResource extends Resource
                                         return $action
                                             ->modalHeading('Crear Material')
                                             ->modalSubmitActionLabel('Crear Material')
-                                            ->modalWidth('sm')
+                                            ->modalWidth(MaxWidth::TwoExtraLarge)
                                             ->action(function (array $data, Set $set) {
                                                 $material = Material::create([
                                                     'descripcion' => $data['descripcion'],
                                                     'depositos_id' => $data['depositos_id'],
+                                                    'unidad_medidas_id' => $data['unidad_medidas_id'],
                                                     'categorias_id' => $data['categorias_id'],
                                                     'alerta' => $data['alerta'],
+                                                    'activo' => $data['activo'],
                                                 ]);
                                                 static::$cantidadMaterial = $data['cantidad'];
+                                                static::$unidadMedida = $material->unidad_medidas_id;
 
                                                 $set('material_id', $material->id);
 
                                                 $set('cantidad', static::$cantidadMaterial);
+                                                $set('unidad_medidas_id', static::$unidadMedida);
 
                                             });
                                     })->columnSpan(1),
 
+                                Select::make('unidad_medidas_id')
+                                    ->label('Unidad de Medidas')
+                                    ->relationship('unidad_medidas', 'unidad')
+                                    ->searchable()
+                                    ->required()
+                                    ->afterStateHydrated(function (Get $get, Set $set) {
+                                        if (! $get('unidad_medidas_id') && $get('material_id')) {
+                                            $set('unidad_medidas_id', static::$unidadMedida);
+                                        }
+                                    })
+                                    ->createOptionForm([
+                                        TextInput::make('unidad')
+                                            ->label('Unidad de Medida')
+                                            ->required(),
+                                    ])
+                                    ->createOptionAction(function (Action $action) {
+                                        return $action
+                                            ->modalHeading('Crear Unidad de Medida')
+                                            ->modalSubmitActionLabel('Crear Unidad')
+                                            ->modalWidth('sm');
+                                    }),
                                 TextInput::make('cantidad')
                                     ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
                                     ->numeric()
@@ -126,9 +154,8 @@ class EntradaResource extends Resource
                             ])
                             ->addActionLabel('Agregar otro material')
                             ->live()
-                            ->columns(2),
+                            ->columns(3),
                     ]),
-                // ]),
 
             ]);
     }
@@ -147,7 +174,9 @@ class EntradaResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\EditAction::make(),
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -176,48 +205,72 @@ class EntradaResource extends Resource
     {
         return [
 
-            TextInput::make('descripcion')
-                ->label('Descripcion del material')
-                ->required(),
-            TextInput::make('cantidad')
-                ->required()
-                ->numeric()
-                ->minValue(1),
+            Section::make()
+                ->schema([
+                    TextInput::make('descripcion')
+                        ->label('Descripcion del material')
+                        ->required(),
+                    Select::make('unidad_medidas_id')
+                        ->label('Unidad de Medidas')
+                        ->relationship('unidad_medidas', 'unidad')
+                        ->options(UnidadMedidas::all()->pluck('unidad', 'id'))
+                        ->searchable()
+                        ->required()
+                        ->createOptionForm([
+                            TextInput::make('unidad')
+                                ->label('Unidad de Medida')
+                                ->required(),
+                        ])
+                        ->createOptionAction(function (Action $action) {
+                            return $action
+                                ->modalHeading('Crear Unidad de Medida')
+                                ->modalSubmitActionLabel('Crear Unidad')
+                                ->modalWidth('sm');
+                        }),
+                    TextInput::make('cantidad')
+                        ->required()
+                        ->numeric()
+                        ->minValue(1),
 
-            Select::make('depositos_id')
-                ->relationship('deposito', 'name')
-                ->options(Deposito::all()->pluck('name', 'id'))
-                ->searchable()
-                ->required()
-                ->createOptionForm([
-                    TextInput::make('name')
-                        ->label('Nombre Deposito')
-                        ->required(),
-                ])
-                ->createOptionAction(function (Action $action) {
-                    return $action
-                        ->modalHeading('Crear Deposito')
-                        ->modalSubmitActionLabel('Crear Deposito')
-                        ->modalWidth('sm');
-                }),
-            Select::make('categorias_id')
-                ->relationship('categoria', 'name')
-                ->searchable()
-                ->required()
-                ->createOptionForm([
-                    TextInput::make('name')
-                        ->label('Nombre Categoria')
-                        ->required(),
-                ])
-                ->createOptionAction(function (Action $action) {
-                    return $action
-                        ->modalHeading('Crear Categoria')
-                        ->modalSubmitActionLabel('Crear Categoria')
-                        ->modalWidth('sm');
-                }),
-            TextInput::make('alerta')
-                ->label('Numero minimo permitido')
-                ->numeric(),
+                    Select::make('depositos_id')
+                        ->relationship('deposito', 'name')
+                        ->options(Deposito::all()->pluck('name', 'id'))
+                        ->searchable()
+                        ->required()
+                        ->createOptionForm([
+                            TextInput::make('name')
+                                ->label('Nombre Deposito')
+                                ->required(),
+                        ])
+                        ->createOptionAction(function (Action $action) {
+                            return $action
+                                ->modalHeading('Crear Deposito')
+                                ->modalSubmitActionLabel('Crear Deposito')
+                                ->modalWidth('sm');
+                        }),
+                    Select::make('categorias_id')
+                        ->relationship('categoria', 'name')
+                        ->searchable()
+                        ->required()
+                        ->createOptionForm([
+                            TextInput::make('name')
+                                ->label('Nombre Categoria')
+                                ->required(),
+                        ])
+                        ->createOptionAction(function (Action $action) {
+                            return $action
+                                ->modalHeading('Crear Categoria')
+                                ->modalSubmitActionLabel('Crear Categoria')
+                                ->modalWidth('sm');
+                        }),
+                    TextInput::make('alerta')
+                        ->label('Numero minimo permitido')
+                        ->numeric(),
+                    Toggle::make('activo')
+                        ->onColor('success')
+                        ->offColor('danger'),
+
+                ])->columns(2),
         ];
     }
 }

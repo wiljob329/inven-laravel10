@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('salidas', function (Blueprint $table) {
             //
-            $table->foreignId('solicitante_id')->constrained('solicitante');
+            $table->string('codigo_uxd')->nullable();
         });
     }
 
@@ -24,8 +24,7 @@ return new class extends Migration
     {
         Schema::table('salidas', function (Blueprint $table) {
             //
-            $table->dropForeign(['solicitante_id']);
-            $table->dropColumn('solicitante_id');
+            $table->dropColumn('codigo_uxd');
         });
     }
 };

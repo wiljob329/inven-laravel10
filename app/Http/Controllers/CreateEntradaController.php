@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Salida;
 use Illuminate\Http\Request;
 
 class CreateEntradaController extends Controller
@@ -18,5 +19,13 @@ class CreateEntradaController extends Controller
         // $count = count($request->input('articulos', []));
 
         // return dd($data);
+    }
+
+    public function pdf(Request $request)
+    {
+        $record = Salida::all()->first();
+
+        return view('test', compact('record'));
+
     }
 }

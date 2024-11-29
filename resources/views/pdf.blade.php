@@ -90,20 +90,33 @@
             <td colspan="10"></td>
         </tr>
         <tr>
-            <td colspan="5" style="width:50%; font-width: bold">
-                DEPÓSITO: <span style="color:red">Aqui variable deposito</span>
+            <td colspan="2" style="width:50%; font-width: bold;">
+                <span style="font-width: bold;">
+                    SERIAL: {{ $record->serial }}
+                </span>
+            </td>
+            <td colspan="3" style="width:50%; font-width: bold" class="wobl">
+                DEPÓSITO: {{ $record->articulos[0]->material->deposito->name }}
             </td>
             <td colspan="3" style="width:30%;" class="wobl">FECHA: {{ date('d-m-Y', strtotime($record->fecha)) }}
             </td>
-            <td colspan="2" class="wobl">No</td>
+            <td colspan="2" class="wobl">CASO:
+                @if ($record->caso == '1x10')
+                    {{ $record->caso }} {{ $record->codigo_uxd }}
+                @else
+                    {{ $record->caso }}
+                @endif
+            </td>
         </tr>
         <tr>
-            <td colspan="3" class="wobt">SOLICITANTE: {{ $record->entregado_a }}</td>
-            <td colspan="2" class="wobt wobl">CI: {{ $record->cedula }}</td>
-            <td colspan="5" class="wobl wobt"><span>SEGÚN COMUNICACIÓN:</span>S/N</td>
+            <td colspan="3" class="wobt">SOLICITANTE: {{ $record->solicitante->nombre }}</td>
+            <td colspan="2" class="wobt wobl">CI: {{ $record->solicitante->cedula }}</td>
+            <td colspan="5" class="wobl wobt">CARGO: {{ $record->solicitante->cargo }}</td>
         </tr>
         <tr>
-            <td colspan="10" class="wobt">PARA SER USADO EN:</td>
+            <td colspan="5" class="wobt">DESTINO: {{ $record->destino }} </td>
+            <td colspan="3" class="wobt wobl">VEHICULO: {{ $record->vehiculo->tipo }} </td>
+            <td colspan="2" class="wobt wobl">PLACA: {{ $record->vehiculo->placa }} </td>
         </tr>
         <tr class="space" style="height: 50px">
             <td colspan="10"></td>
@@ -145,13 +158,21 @@
                 <td class="tac wobt">{{ $item->id }}</td>
                 <td class="tac wobt wobl">{{ $item->material->id }}</td>
                 <td class="tac wobt wobl">{{ $item->material->descripcion }}</td>
-                <td class="tac wobt wobl"></td>
+                <td class="tac wobt wobl">{{ $item->material->unidad_medidas->unidad }}</td>
                 <td class="tac wobt wobl">{{ $item->cantidad }}</td>
-                <td class="tac wobt wobl"></td>
-                <td class="tac wobt wobl"></td>
-                <td class="tac wobt wobl"></td>
-                <td class="tac wobt wobl"></td>
-                <td class="tac wobt wobl"></td>
+                @if ($item->material->activo)
+                    <td class="tac wobt wobl">X</td>
+                    <td class="tac wobt wobl"></td>
+                    <td class="tac wobt wobl">{{ $record->destino }}</td>
+                    <td class="tac wobt wobl"></td>
+                    <td class="tac wobt wobl">X</td>
+                @else
+                    <td class="tac wobt wobl"></td>
+                    <td class="tac wobt wobl">X</td>
+                    <td class="tac wobt wobl">{{ $record->destino }}</td>
+                    <td class="tac wobt wobl">X</td>
+                    <td class="tac wobt wobl"></td>
+                @endif
             </tr>
         @endforeach
 
@@ -214,9 +235,22 @@
             <td colspan="3" class="lineh wobt wobl">Firma:</td>
         </tr>
         <tr>
-            <td colspan="3" class="wobt">Nombre:<br />Cargo:<br />C.I:</td>
-            <td colspan="4" class="wobt wobl">Nombre:<br />Cargo:<br />C.I:</td>
-            <td colspan="3" class="wobt wobl">Nombre:<br />Cargo:<br />C.I:</td>
+            <td colspan="3" class="wobt">
+                Nombre: {{ auth()->user()->name }}<br />
+                Cargo:<br />
+                C.I:
+            </td>
+            <td colspan="4" class="wobt wobl">
+                Nombre:<br />
+                Cargo:<br />
+                C.I:
+            </td>
+            <td colspan="3" class="wobt wobl">
+                Nombre: <span style="font-width: bold">{{ $record->solicitante->nombre }}</span><br />
+                Cargo: <span style="font-width: bold">{{ $record->solicitante->cargo }} -
+                    {{ $record->solicitante->gerencia }}</span><br />
+                C.I: <span style="font-width: bold">{{ $record->solicitante->cedula }}</span>
+            </td>
         </tr>
 
     </table>

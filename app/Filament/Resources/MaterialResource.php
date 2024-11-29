@@ -9,9 +9,11 @@ use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -34,6 +36,23 @@ class MaterialResource extends Resource
                                 TextInput::make('descripcion')
                                     ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
                                     ->required(),
+                                Select::make('unidad_medidas_id')
+                                    ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
+                                    ->label('Unidad de Medidas')
+                                    ->relationship('unidad_medidas', 'unidad')
+                                    ->searchable()
+                                    ->required()
+                                    ->createOptionForm([
+                                        TextInput::make('unidad')
+                                            ->label('Unidad de Medida')
+                                            ->required(),
+                                    ])
+                                    ->createOptionAction(function (Action $action) {
+                                        return $action
+                                            ->modalHeading('Crear Unidad de Medida')
+                                            ->modalSubmitActionLabel('Crear Unidad')
+                                            ->modalWidth('sm');
+                                    }),
                                 TextInput::make('cantidad')
                                     ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
                                     ->numeric(),
@@ -74,6 +93,9 @@ class MaterialResource extends Resource
                                     ->label('Numero minimo permitido')
                                     ->required()
                                     ->numeric(),
+                                Toggle::make('activo')
+                                    ->onColor('success')
+                                    ->offColor('danger'),
 
                             ])
                             ->columns(3),
@@ -87,10 +109,12 @@ class MaterialResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('descripcion')->searchable()->toggleable(),
+                TextColumn::make('unidad_medidas.unidad')->searchable()->toggleable(),
                 TextColumn::make('cantidad')->toggleable()->searchable(),
                 TextColumn::make('deposito.name')->toggleable()->searchable(),
-                TextColumn::make('categoria.name')->searchable(),
+                TextColumn::make('categoria.name')->searchable()->toggleable(),
                 TextColumn::make('alerta')->toggleable(),
+                IconColumn::make('activo')->boolean(),
             ])
             ->recordClasses(function ($record) {
                 return $record->cantidad <= $record->alerta ? 'alerta' : null;

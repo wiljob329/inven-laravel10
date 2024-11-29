@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CreateEntradaController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -17,6 +18,4 @@ Route::get('/', function () {
     return redirect('dashboard');
 });
 
-Route::get('/pdf', function () {
-    return view('pdf');
-});
+Route::get('/pdf', [CreateEntradaController::class, 'pdf']);

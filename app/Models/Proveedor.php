@@ -9,7 +9,7 @@ class Proveedor extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'info_contacto'];
+    protected $fillable = ['name', 'info_contacto', 'rif'];
 
     public function entradas()
     {

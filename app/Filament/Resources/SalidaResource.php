@@ -3,19 +3,34 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\SalidaResource\Pages;
+use App\Models\Material;
 use App\Models\Salida;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
 use Filament\Resources\Resource;
+use Filament\Support\Contracts\HasLabel;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Blade;
+
+enum Casos: string implements HasLabel
+{
+    case Eventual = 'eventual';
+    case Unox10 = '1x10';
+
+    public function getLabel(): ?string
+    {
+        return $this->name;
+    }
+}
 
 class SalidaResource extends Resource
 {
@@ -32,6 +47,12 @@ class SalidaResource extends Resource
                 //
                 Section::make()
                     ->schema([
+                        TextInput::make('serial')
+                            ->default(fn () => Salida::getNextCode())
+                            ->disabled()
+                            ->dehydrated()
+                            ->label('Serial Salida')
+                            ->required(),
                         DatePicker::make('fecha')
                             ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
                             ->required()
@@ -39,23 +60,63 @@ class SalidaResource extends Resource
                             ->suffixIcon('heroicon-o-calendar')
                             ->closeOnDateSelection()
                             ->displayFormat('d/m/Y'),
-                        TextInput::make('entregado_a')
-                            ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
-                            ->required(),
-                        TextInput::make('departamento')
-                            ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
-                            ->required(),
                         TextInput::make('destino')
                             ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
                             ->required(),
-                        TextInput::make('cedula')
+                        Select::make('solicitantes_id')
+                            ->relationship('solicitante', 'nombre')
+                            ->searchable()
+                            ->required()
                             ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
-                            ->required(),
-
-                        TextInput::make('vehicle_placa')
+                            ->createOptionForm([
+                                TextInput::make('nombre')
+                                    ->label('Nombre')
+                                    ->required(),
+                                TextInput::make('cargo')
+                                    ->label('Cargo')
+                                    ->required(),
+                                TextInput::make('gerencia')
+                                    ->label('Gerencia')
+                                    ->required(),
+                                TextInput::make('cedula')
+                                    ->label('Cedula')
+                                    ->required(),
+                            ])
+                            ->createOptionAction(function (Action $action) {
+                                return $action
+                                    ->modalHeading('Crear Solicitante')
+                                    ->modalSubmitActionLabel('Crear Solicitante')
+                                    ->modalWidth('sm');
+                            }),
+                        Select::make('vehiculos_id')
+                            ->relationship('vehiculo', 'placa')
+                            ->searchable()
+                            ->required()
                             ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
-                            ->label('Placa del Vehiculo')
-                            ->required(),
+                            ->createOptionForm([
+                                TextInput::make('tipo')
+                                    ->label('Tipo Vehiculo')
+                                    ->required(),
+                                TextInput::make('placa')
+                                    ->label('Placa')
+                                    ->required(),
+                            ])
+                            ->createOptionAction(function (Action $action) {
+                                return $action
+                                    ->modalHeading('Crear Vehiculo')
+                                    ->modalSubmitActionLabel('Crear Vehiculo')
+                                    ->modalWidth('sm');
+                            }),
+                        Select::make('caso')
+                            ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
+                            ->native(false)
+                            ->live()
+                            ->options(Casos::class),
+                        TextInput::make('codigo_uxd')
+                            ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
+                            ->label('Codigo uno x 10')
+                            ->live()
+                            ->hidden(fn (Get $get) => $get('caso') != '1x10'),
 
                     ])->columns(3),
                 Section::make('Seleccion de materiales')
@@ -66,17 +127,16 @@ class SalidaResource extends Resource
                             ->relationship('articulos')
                             ->schema([
                                 Select::make('material_id')
-                                    ->searchable()
                                     ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
                                     ->relationship('material', 'descripcion')
-                                    ->required()
-                                    ->columnSpan(1),
+                                    ->searchable()
+                                    ->suffix(fn (Get $get) => Material::find($get('material_id'))->unidad_medidas->unidad ?? '')
+                                    ->required(),
                                 TextInput::make('cantidad')
                                     ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
                                     ->numeric()
                                     ->required()
-                                    ->minValue(1)
-                                    ->columnSpan(1),
+                                    ->minValue(1),
                             ])
                             ->addActionLabel('Agregar otro material')
                             ->live()
@@ -90,12 +150,15 @@ class SalidaResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('fecha')->date(),
-                TextColumn::make('entregado_a')->searchable(),
-                TextColumn::make('departamento'),
-                TextColumn::make('destino'),
-                TextColumn::make('cedula'),
-                TextColumn::make('vehicle_placa'),
+                TextColumn::make('serial'),
+                TextColumn::make('fecha')->date()->toggleable(),
+                TextColumn::make('solicitante.nombre')->searchable(),
+                TextColumn::make('destino')->toggleable(),
+                TextColumn::make('solicitante.cedula')->label('Cedula Solicitante')->toggleable(),
+                TextColumn::make('vehiculo.placa')->toggleable(),
+                TextColumn::make('caso')->toggleable(),
+                TextColumn::make('codigo_uxd')->toggleable(),
+
             ])
             ->filters([
                 //
@@ -113,7 +176,7 @@ class SalidaResource extends Resource
                                     echo Pdf::loadHtml(
                                         Blade::render('pdf', ['record' => $record])
                                     )
-                                        ->setPaper('letter', 'landscape')
+                                        ->setPaper('A4', 'landscape')
                                         ->download();
                                 }, $record->number.'.pdf');
                         }),

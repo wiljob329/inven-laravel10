@@ -9,7 +9,7 @@ class Salida extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['fecha',  'destino', 'solicitante_id', 'vehiculo_id', 'caso', 'serial'];
+    protected $fillable = ['fecha',  'destino', 'solicitantes_id', 'vehiculos_id', 'caso', 'serial', 'codigo_uxd'];
 
     public function articulos()
     {
@@ -18,12 +18,12 @@ class Salida extends Model
 
     public function solicitante()
     {
-        return $this->belongsTo(Solicitante::class);
+        return $this->belongsTo(Solicitante::class, 'solicitantes_id');
     }
 
     public function vehiculo()
     {
-        return $this->belongsTo(Vehiculo::class);
+        return $this->belongsTo(Vehiculo::class, 'vehiculos_id');
     }
 
     public static function getNextCode(): string
