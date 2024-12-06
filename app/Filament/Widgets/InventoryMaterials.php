@@ -7,6 +7,7 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
+use Illuminate\Database\Eloquent\Model;
 
 class InventoryMaterials extends BaseWidget
 {
@@ -21,6 +22,7 @@ class InventoryMaterials extends BaseWidget
             ->query(MaterialResource::getEloquentQuery())
             ->defaultSort('created_at', 'desc')
             ->heading('Inventario de Materiales')
+            ->recordUrl(fn (Model $record) => route('filament.dashboard.resources.materials.edit', $record))
             ->striped()
             ->columns([
                 TextColumn::make('descripcion')->searchable()->toggleable(),
