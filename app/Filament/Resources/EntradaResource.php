@@ -166,7 +166,7 @@ class EntradaResource extends Resource
             ->columns([
                 TextColumn::make('codigo_nota_entrega')->searchable(),
                 TextColumn::make('fecha')->date(),
-                TextColumn::make('recibido_por'),
+                TextColumn::make('encargado.nombre'),
                 TextColumn::make('proveedor.name'),
 
             ])

@@ -9,7 +9,17 @@ class Salida extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['fecha',  'destino', 'solicitantes_id', 'vehiculos_id', 'caso', 'serial', 'codigo_uxd'];
+    protected $fillable = [
+        'fecha',
+        'destino',
+        'solicitantes_id',
+        'vehiculos_id',
+        'caso',
+        'serial',
+        'codigo_uxd',
+        'encargado_id',
+        'jefe_id',
+    ];
 
     public function articulos()
     {
@@ -19,6 +29,16 @@ class Salida extends Model
     public function solicitante()
     {
         return $this->belongsTo(Solicitante::class, 'solicitantes_id');
+    }
+
+    public function encargado()
+    {
+        return $this->belongsTo(User::class, 'encargado_id');
+    }
+
+    public function jefe()
+    {
+        return $this->belongsTo(Jefe::class, 'jefe_id');
     }
 
     public function vehiculo()

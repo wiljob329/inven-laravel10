@@ -30,6 +30,14 @@ class UserResource extends Resource
                         ->label('Nombre')
                         ->required()
                         ->maxLength(255),
+                    Forms\Components\TextInput::make('cargo')
+                        ->label('Cargo')
+                        ->required()
+                        ->maxLength(255),
+                    Forms\Components\TextInput::make('cedula')
+                        ->label('Cedula')
+                        ->required()
+                        ->maxLength(255),
                     Forms\Components\TextInput::make('email')
                         ->label('Correo')
                         ->email()
@@ -55,6 +63,12 @@ class UserResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->label('Nombre')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('cargo')
+                    ->label('Cargo')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('cedula')
+                    ->label('Cedula')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('email')
                     ->label('Correo')

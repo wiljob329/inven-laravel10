@@ -9,7 +9,7 @@ class Entrada extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['codigo_nota_entrega', 'fecha', 'recibido_por', 'proveedors_id'];
+    protected $fillable = ['codigo_nota_entrega', 'fecha', 'encargado_id', 'proveedors_id'];
 
     public static function getNextCode(): string
     {
@@ -22,6 +22,11 @@ class Entrada extends Model
         }
 
         return 'INV'.str_pad($number, 5, '0', STR_PAD_LEFT);
+    }
+
+    public function encargado()
+    {
+        return $this->belongsTo(User::class, 'encargado_id');
     }
 
     public function proveedor()
