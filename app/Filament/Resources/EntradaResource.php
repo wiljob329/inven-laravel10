@@ -55,11 +55,12 @@ class EntradaResource extends Resource
                             ->closeOnDateSelection()
                             ->displayFormat('d/m/Y')
                             ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito')),
-                        TextInput::make('recibido_por')
-                            ->default(auth()->user()->name)
+                        Select::make('encargado_id')
+                            ->label('Encargado')
+                            ->options([auth()->user()->id => auth()->user()->name])
+                            ->default(auth()->user()->id)
                             ->disabled()
-                            ->dehydrated()
-                            ->required(),
+                            ->dehydrated(),
                         Select::make('proveedors_id')
                             ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
                             ->relationship('proveedor', 'name')
@@ -123,6 +124,7 @@ class EntradaResource extends Resource
                                 Select::make('unidad_medidas_id')
                                     ->label('Unidad de Medidas')
                                     ->relationship('unidad_medidas', 'unidad')
+                                    ->options(UnidadMedidas::all()->pluck('unidad', 'id'))
                                     ->searchable()
                                     ->required()
                                     ->afterStateHydrated(function (Get $get, Set $set) {
@@ -166,7 +168,7 @@ class EntradaResource extends Resource
             ->columns([
                 TextColumn::make('codigo_nota_entrega')->searchable(),
                 TextColumn::make('fecha')->date(),
-                TextColumn::make('encargado.nombre'),
+                TextColumn::make('encargado.name'),
                 TextColumn::make('proveedor.name'),
 
             ])

@@ -53,6 +53,12 @@ class SalidaResource extends Resource
                             ->dehydrated()
                             ->label('Serial Salida')
                             ->required(),
+                        Select::make('encargado_id')
+                            ->label('Encargado')
+                            ->options([auth()->user()->id => auth()->user()->name])
+                            ->default(auth()->user()->id)
+                            ->disabled()
+                            ->dehydrated(),
                         DatePicker::make('fecha')
                             ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
                             ->required()
