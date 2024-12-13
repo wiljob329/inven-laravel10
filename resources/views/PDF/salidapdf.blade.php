@@ -236,14 +236,14 @@
         </tr>
         <tr>
             <td colspan="3" class="wobt">
-                Nombre: {{ auth()->user()->name }}<br />
-                Cargo:<br />
-                C.I:
+                Nombre: <span style="font-width: bold">{{ auth()->user()->name }}</span><br />
+                Cargo: <span style="font-width: bold">{{ auth()->user()->cargo }}</span><br />
+                C.I: <span style="font-width: bold">{{ auth()->user()->cedula }}</span>
             </td>
             <td colspan="4" class="wobt wobl">
-                Nombre:<br />
-                Cargo:<br />
-                C.I:
+                Nombre: <span style="font-width: bold">{{ $record->jefe->nombre }}</span><br />
+                Cargo: <span style="font-width: bold">{{ $record->jefe->cargo }}</span><br />
+                C.I: <span style="font-width: bold">{{ $record->jefe->cedula }}</span>
             </td>
             <td colspan="3" class="wobt wobl">
                 Nombre: <span style="font-width: bold">{{ $record->solicitante->nombre }}</span><br />

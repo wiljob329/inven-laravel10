@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\SalidaResource\Pages;
+use App\Models\Jefe;
 use App\Models\Material;
 use App\Models\Salida;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -118,6 +119,12 @@ class SalidaResource extends Resource
                             ->native(false)
                             ->live()
                             ->options(Casos::class),
+                        Select::make('jefe_id')
+                            ->label('Aprobado por')
+                            ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
+                            ->native(false)
+                            ->live()
+                            ->options(Jefe::all()->pluck('nombre', 'id')),
                         TextInput::make('codigo_uxd')
                             ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
                             ->label('Codigo uno x 10')
@@ -180,11 +187,11 @@ class SalidaResource extends Resource
                             return response()
                                 ->streamDownload(function () use ($record) {
                                     echo Pdf::loadHtml(
-                                        Blade::render('pdf', ['record' => $record])
+                                        Blade::render('PDF/salidapdf', ['record' => $record])
                                     )
                                         ->setPaper('A4', 'landscape')
                                         ->download();
-                                }, $record->number.'.pdf');
+                                }, $record->serial.'.pdf');
                         }),
                 ]),
             ])

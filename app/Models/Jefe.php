@@ -9,6 +9,8 @@ class Jefe extends Model
 {
     use HasFactory;
 
+    protected $table = 'jefes';
+
     protected $fillable = ['nombre', 'cargo', 'cedula'];
 
     public function salidas()
