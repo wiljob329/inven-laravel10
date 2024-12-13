@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::table('salidas', function (Blueprint $table) {
             //
             $table->foreignId('encargado_id')->constrained('users')->cascadeOnDelete();
-            $table->foreignId('jefe_id')->constrained('jefes')->cascadeOnDelete();
+            $table->foreignId('jefe_id')->nullable()->constrained('jefes')->cascadeOnDelete();
         });
     }
 
