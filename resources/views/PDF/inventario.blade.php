@@ -44,7 +44,7 @@
             </tr>
             <tr>
                 <!-- Personaliza los encabezados según tus columnas -->
-                <th>ID</th>
+                <th>Codigo</th>
                 <th>Descripcion</th>
                 <th>Cantidad</th>
                 <th>Unidad de Medida</th>
