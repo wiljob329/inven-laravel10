@@ -3,6 +3,7 @@
 namespace App\Filament\Widgets;
 
 use App\Filament\Resources\MaterialResource;
+use App\Models\Material;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Filament\Forms\Components\DatePicker;
 use Filament\Tables\Actions\Action;
@@ -11,7 +12,6 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Blade;
 
@@ -47,30 +47,48 @@ class InventoryMaterials extends BaseWidget
                         DatePicker::make('to')
                             ->label('Hasta')->default(now()),
                     ])
-                    ->query(function (Builder $query, array $data): Builder {
+                    ->query(function ($query, array $data) {
                         return $query
                             ->when(
                                 $data['from'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date)
+                                fn ($query) => $query->whereDate('created_at', '>=', $data['from'])
                             )
                             ->when(
                                 $data['to'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date)
+                                fn ($query) => $query->whereDate('created_at', '<=', $data['to'])
                             );
                     }),
             ])
             ->headerActions([
                 Action::make('exportPdf')
-                    ->label('PDF')
+                    ->label('Generar PDF')
                     ->icon('heroicon-o-arrow-down-tray')
                     ->color('primary')
-                    ->action(function () {
-                        $record = MaterialResource::getEloquentQuery()->get();
+                    ->action(function ($livewire) {
+                        $filters = $livewire->tableFilters['created_at'];
+                        $from = $filters['from'];
+                        $to = $filters['to'];
+                        //$record = MaterialResource::getEloquentQuery()->get();
+
+                        $query = Material::query();
+                        if (! empty($from)) {
+                            $query->whereDate('created_at', '>=', $from);
+                        }
+                        if (! empty($to)) {
+                            $query->whereDate('created_at', '<=', $to);
+                        }
+
+                        $record = $query->get();
 
                         return response()
-                            ->streamDownload(function () use ($record) {
+                            ->streamDownload(function () use ($record, $from, $to) {
                                 echo Pdf::loadHtml(
-                                    Blade::render('PDF.inventario', ['registros' => $record, 'titulo' => 'Inventario Deposito Libertador'])
+                                    Blade::render('PDF.inventario', [
+                                        'registros' => $record,
+                                        'from' => $from,
+                                        'to' => $to,
+                                        'titulo' => 'Inventario Deposito',
+                                    ])
                                 )
                                     ->setPaper('A4', 'landscape')
                                     ->download();

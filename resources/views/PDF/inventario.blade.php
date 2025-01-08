@@ -40,7 +40,14 @@
     <table>
         <thead>
             <tr>
-                <th colspan=8 style="text-align:center"> INVENTARIO DEPOSITO LIBERTADOR</th>
+                <th colspan=8 style="text-align:center">{{ $titulo }}, Periodo:
+                    @if ($from)
+                        {{ date('d/m/Y', strtotime($from)) }} -
+                        {{ date('d/m/Y', strtotime($to)) }}
+                    @else
+                        Hasta {{ date('d/m/Y', strtotime($to)) }}
+                    @endif
+                </th>
             </tr>
             <tr>
                 <!-- Personaliza los encabezados según tus columnas -->
