@@ -3,6 +3,7 @@
 namespace App\Filament\Widgets;
 
 use App\Filament\Resources\MaterialResource;
+use App\Models\Deposito;
 use App\Models\Material;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Filament\Forms\Components\DatePicker;
@@ -10,6 +11,7 @@ use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
 use Illuminate\Database\Eloquent\Model;
@@ -58,6 +60,14 @@ class InventoryMaterials extends BaseWidget
                                 fn ($query) => $query->whereDate('created_at', '<=', $data['to'])
                             );
                     }),
+                SelectFilter::make('depositos_id')
+                    ->label('Deposito')
+                    ->options(function () {
+                        return Deposito::pluck('name', 'id');
+                    })
+                    ->placeholder('Seleccionar deposito')
+                    ->multiple()
+                    ->preload(),
             ])
             ->headerActions([
                 Action::make('exportPdf')
@@ -66,6 +76,7 @@ class InventoryMaterials extends BaseWidget
                     ->color('primary')
                     ->action(function ($livewire) {
                         $filters = $livewire->tableFilters['created_at'];
+                        $depositos = $livewire->tableFilters['depositos_id'];
                         $from = $filters['from'];
                         $to = $filters['to'];
                         //$record = MaterialResource::getEloquentQuery()->get();
@@ -77,17 +88,21 @@ class InventoryMaterials extends BaseWidget
                         if (! empty($to)) {
                             $query->whereDate('created_at', '<=', $to);
                         }
+                        if (! empty($depositos)) {
+                            $query->whereIn('depositos_id', $depositos);
+                        }
 
                         $record = $query->get();
 
                         return response()
-                            ->streamDownload(function () use ($record, $from, $to) {
+                            ->streamDownload(function () use ($record, $from, $to, $depositos) {
                                 echo Pdf::loadHtml(
                                     Blade::render('PDF.inventario', [
                                         'registros' => $record,
                                         'from' => $from,
                                         'to' => $to,
                                         'titulo' => 'Inventario Deposito',
+                                        'depositos' => Deposito::whereIn('id', $depositos ?? [])->pluck('name'),
                                     ])
                                 )
                                     ->setPaper('A4', 'landscape')
