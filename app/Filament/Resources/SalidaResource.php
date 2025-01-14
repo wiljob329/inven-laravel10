@@ -191,7 +191,7 @@ class SalidaResource extends Resource
                                     )
                                         ->setPaper('A4', 'landscape')
                                         ->download();
-                                }, $record->serial.'.pdf');
+                                }, $record->serial.now()->format('YmdHis').'.pdf');
                         }),
                 ]),
             ])

@@ -77,6 +77,8 @@ class InventoryMaterials extends BaseWidget
                     ->action(function ($livewire) {
                         $filters = $livewire->tableFilters['created_at'];
                         $depositos = $livewire->tableFilters['depositos_id'];
+                        // dd($depositos);
+                        // exit;
                         $from = $filters['from'];
                         $to = $filters['to'];
                         //$record = MaterialResource::getEloquentQuery()->get();
@@ -88,7 +90,7 @@ class InventoryMaterials extends BaseWidget
                         if (! empty($to)) {
                             $query->whereDate('created_at', '<=', $to);
                         }
-                        if (! empty($depositos)) {
+                        if (! empty($depositos['values'])) {
                             $query->whereIn('depositos_id', $depositos);
                         }
 
@@ -102,7 +104,7 @@ class InventoryMaterials extends BaseWidget
                                         'from' => $from,
                                         'to' => $to,
                                         'titulo' => 'Inventario Deposito',
-                                        'depositos' => Deposito::whereIn('id', $depositos ?? [])->pluck('name'),
+                                        'depositos' => $depositos,
                                     ])
                                 )
                                     ->setPaper('A4', 'landscape')

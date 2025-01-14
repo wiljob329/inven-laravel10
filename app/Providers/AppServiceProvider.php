@@ -29,7 +29,7 @@ class AppServiceProvider extends ServiceProvider
         ArticuloEntrada::observe(ArticuloEntradaObserver::class);
         ArticuloSalida::observe(ArticuloSalidaObserver::class);
         FilamentAsset::register([
-            Css::make('app', __DIR__.'/css/app'),
+            Css::make('app', public_path('/css/app')),
         ]);
     }
 }

@@ -7,6 +7,7 @@ use App\Models\Deposito;
 use App\Models\Entrada;
 use App\Models\Material;
 use App\Models\UnidadMedidas;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Repeater;
@@ -22,6 +23,7 @@ use Filament\Support\Enums\MaxWidth;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Blade;
 
 class EntradaResource extends Resource
 {
@@ -178,6 +180,20 @@ class EntradaResource extends Resource
             ->actions([
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\EditAction::make(),
+                    Tables\Actions\Action::make('pdf')
+                        ->label('PDF')
+                        ->color('success')
+                        ->icon('heroicon-o-arrow-down-tray')
+                        ->action(function (Entrada $record) {
+                            return response()
+                                ->streamDownload(function () use ($record) {
+                                    echo Pdf::loadHtml(
+                                        Blade::render('PDF/entradapdf', ['record' => $record])
+                                    )
+                                        ->setPaper('A4', 'landscape')
+                                        ->download();
+                                }, $record->codigo_nota_entrega.now()->format('YmdHis').'.pdf');
+                        }),
                 ]),
             ])
             ->bulkActions([
