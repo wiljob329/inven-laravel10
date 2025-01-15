@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\EntradaResource\Pages;
+use App\Models\Cuadrilla;
 use App\Models\Deposito;
 use App\Models\Entrada;
 use App\Models\Material;
@@ -82,6 +83,16 @@ class EntradaResource extends Resource
                                     ->modalSubmitActionLabel('Crear Proveedor')
                                     ->modalWidth('sm');
                             }),
+                        Toggle::make('cuadrilla')
+                            ->label('Movimiento de cuadrilla')
+                            ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
+                            ->onColor('success')
+                            ->offColor('danger')
+                            ->live(),
+                        Select::make('cuadrilla_id')//falta validar que cuando se escoje una cuadrilla y se pone en off el boton cuadrilla no se envie
+                            ->label('Cuadrillas')
+                            ->options(Cuadrilla::all()->pluck('nombre', 'id'))
+                            ->hidden(fn (Get $get) => $get('cuadrilla') == false),
 
                     ])->columns(4),
 

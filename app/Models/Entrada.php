@@ -38,4 +38,9 @@ class Entrada extends Model
     {
         return $this->hasMany(ArticuloEntrada::class);
     }
+
+    public function cuadrilla()
+    {
+        return $this->belongsTo(Cuadrilla::class, 'cuadrilla_id');
+    }
 }

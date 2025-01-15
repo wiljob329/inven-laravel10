@@ -46,6 +46,11 @@ class Salida extends Model
         return $this->belongsTo(Vehiculo::class, 'vehiculos_id');
     }
 
+    public function cuadrilla()
+    {
+        return $this->belongsTo(Cuadrilla::class, 'cuadrilla_id');
+    }
+
     public static function getNextCode(): string
     {
         $lastSalida = static::orderBy('id', 'desc')->first();

@@ -161,11 +161,11 @@
                 @if ($item->material->activo)
                     <td class="tac wobt wobl">X</td>
                     <td class="tac wobt wobl"></td>
-                    <td class="tac wobt wobl" colspan="3">{{ $record->destino }}</td>
+                    <td class="tac wobt wobl" colspan="3"></td>
                 @else
                     <td class="tac wobt wobl"></td>
                     <td class="tac wobt wobl">X</td>
-                    <td class="tac wobt wobl" colspan="3">{{ $record->destino }}</td>
+                    <td class="tac wobt wobl" colspan="3"></td>
                 @endif
             </tr>
         @endforeach
