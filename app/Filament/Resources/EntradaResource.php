@@ -68,7 +68,7 @@ class EntradaResource extends Resource
                             ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
                             ->relationship('proveedor', 'name')
                             ->searchable()
-                            ->required()
+                            //->required()
                             ->createOptionForm([
                                 TextInput::make('name')
                                     ->label('Nombre del Proveedor')
@@ -88,11 +88,20 @@ class EntradaResource extends Resource
                             ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
                             ->onColor('success')
                             ->offColor('danger')
+                            ->inline(false)
+                            // ->default(function (string $operation) {
+                            //     if ($operation == 'edit') {
+                            //         return $this->record->cuadrilla_id != null;
+                            //     }
+                            //
+                            //     return false;
+                            // })
                             ->live(),
-                        Select::make('cuadrilla_id')//falta validar que cuando se escoje una cuadrilla y se pone en off el boton cuadrilla no se envie
+                        Select::make('cuadrilla_id')
                             ->label('Cuadrillas')
-                            ->options(Cuadrilla::all()->pluck('nombre', 'id'))
-                            ->hidden(fn (Get $get) => $get('cuadrilla') == false),
+                            ->native(false)
+                            ->hidden(fn (Get $get) => $get('cuadrilla') == false)
+                            ->options(Cuadrilla::all()->pluck('nombre', 'id')),
 
                     ])->columns(4),
 
@@ -180,11 +189,12 @@ class EntradaResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('codigo_nota_entrega')->searchable(),
-                TextColumn::make('fecha')->date(),
+                TextColumn::make('fecha')->date('d/m/Y'),
                 TextColumn::make('encargado.name'),
                 TextColumn::make('proveedor.name'),
 
             ])
+            ->defaultSort('fecha', 'desc')
             ->filters([
                 //
             ])

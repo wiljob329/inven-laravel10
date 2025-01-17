@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('codigo_nota_entrega');
             $table->date('fecha');
             $table->string('recibido_por');
-            $table->foreignId('proveedors_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('proveedors_id')->nullable()->constrained()->cascadeOnDelete();
             $table->timestamps();
         });
     }

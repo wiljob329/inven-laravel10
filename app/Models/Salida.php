@@ -19,6 +19,7 @@ class Salida extends Model
         'codigo_uxd',
         'encargado_id',
         'jefe_id',
+        'cuadrilla_id',
     ];
 
     public function articulos()

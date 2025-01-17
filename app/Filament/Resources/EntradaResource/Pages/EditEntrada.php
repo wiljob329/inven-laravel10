@@ -16,4 +16,13 @@ class EditEntrada extends EditRecord
             // Actions\DeleteAction::make(),
         ];
     }
+
+    public function mount(int|string $record): void
+    {
+        parent::mount($record);
+        dd($this->record->toArray());
+        //
+        // dd($this->record->cuadrilla_id);
+        // dd($this->form->getState()['cuadrilla_id']);
+    }
 }

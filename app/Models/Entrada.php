@@ -9,7 +9,7 @@ class Entrada extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['codigo_nota_entrega', 'fecha', 'encargado_id', 'proveedors_id'];
+    protected $fillable = ['codigo_nota_entrega', 'fecha', 'encargado_id', 'proveedors_id', 'cuadrilla_id'];
 
     public static function getNextCode(): string
     {
