@@ -106,7 +106,13 @@
             --}}
         </tr>
         <tr>
-            <td colspan="7" class="wobt">ENTREGADO POR: {{ $record->proveedor->name }}</td>
+            <td colspan="7" class="wobt">
+                @if ($record->proveedor)
+                    ENTREGADO POR PROVEEDOR: {{ $record->proveedor->name }}
+                @else
+                    ENTREGADO POR CUADRILLA: {{ $record->cuadrilla->nombre }}
+                @endif
+            </td>
             <td colspan="3" class="wobl wobt">SEGUN COMUNICADO: {{ $record->codigo_nota_entrega }} </td>
         </tr>
         <tr>
@@ -217,13 +223,17 @@
         </tr>
         <tr>
             <td colspan="4" class="wobt">
-                Nombre: <span style="font-width: bold">{{ auth()->user()->name }}</span><br />
-                Cargo: <span style="font-width: bold">{{ auth()->user()->cargo }}</span><br />
+                NOMBRE: <span style="font-width: bold">{{ auth()->user()->name }}</span><br />
+                CARGO: <span style="font-width: bold">{{ auth()->user()->cargo }}</span><br />
                 C.I: <span style="font-width: bold">{{ auth()->user()->cedula }}</span>
             </td>
             <td colspan="6" class="wobt wobl">
-                Nombre: <span style="font-width: bold">{{ $record->proveedor->name }}</span><br />
-                RIF: <span style="font-width: bold">{{ $record->proveedor->rif }}</span>
+                @if ($record->proveedor)
+                    PROVEEDOR: <span style="font-width: bold">{{ $record->proveedor->name }}</span><br />
+                    RIF: <span style="font-width: bold">{{ $record->proveedor->rif }}</span>
+                @else
+                    CUADRILLA: <span style="font-width: bold">{{ $record->cuadrilla->nombre }}</span><br />
+                @endif
             </td>
         </tr>
 

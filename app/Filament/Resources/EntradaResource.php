@@ -89,13 +89,11 @@ class EntradaResource extends Resource
                             ->onColor('success')
                             ->offColor('danger')
                             ->inline(false)
-                            // ->default(function (string $operation) {
-                            //     if ($operation == 'edit') {
-                            //         return $this->record->cuadrilla_id != null;
-                            //     }
-                            //
-                            //     return false;
-                            // })
+                            ->afterStateHydrated(function (Toggle $component, $state, $record) {
+                                if ($record) {
+                                    $component->state($record->cuadrilla_id !== null);
+                                }
+                            })
                             ->live(),
                         Select::make('cuadrilla_id')
                             ->label('Cuadrillas')

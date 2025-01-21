@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\Auditable;
 
 class Entrada extends Model
 {
     use HasFactory;
+    use Auditable;
 
     protected $fillable = ['codigo_nota_entrega', 'fecha', 'encargado_id', 'proveedors_id', 'cuadrilla_id'];
 

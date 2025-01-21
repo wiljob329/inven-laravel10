@@ -19,11 +19,17 @@ class JefeSeeder extends Seeder
                 'cargo' => 'Presidente(E)',
                 'cedula' => '7097876',
             ]);
+        // Jefe::create(
+        //     [
+        //         'nombre' => 'Jeanmark Gabriel Marquez Buelvas',
+        //         'cargo' => 'Gerente General(P) Ingenieria y Operaciones',
+        //         'cedula' => '24583208',
+        //     ]);
         Jefe::create(
             [
-                'nombre' => 'Jeanmark Gabriel Marquez Buelvas',
+                'nombre' => 'Mayra Alejandra Malpica Gonzalez',
                 'cargo' => 'Gerente General(P) Ingenieria y Operaciones',
-                'cedula' => '24583208',
+                'cedula' => '14286496',
             ]);
         Jefe::create(
             [

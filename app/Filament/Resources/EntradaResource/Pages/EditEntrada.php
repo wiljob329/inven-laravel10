@@ -17,12 +17,12 @@ class EditEntrada extends EditRecord
         ];
     }
 
-    public function mount(int|string $record): void
-    {
-        parent::mount($record);
-        dd($this->record->toArray());
-        //
-        // dd($this->record->cuadrilla_id);
-        // dd($this->form->getState()['cuadrilla_id']);
-    }
+    // public function mount(int|string $record): void
+    // {
+    //     parent::mount($record);
+    //     dd($this->record->toArray());
+    //     //
+    //     // dd($this->record->cuadrilla_id);
+    //     // dd($this->form->getState()['cuadrilla_id']);
+    // }
 }
