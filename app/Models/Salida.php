@@ -22,6 +22,11 @@ class Salida extends Model
         'encargado_id',
         'jefe_id',
         'cuadrilla_id',
+        'es_cuadrilla',
+    ];
+
+    protected $casts = [
+        'es_cuadrilla' => 'boolean',
     ];
 
     public function articulos()
@@ -56,14 +61,16 @@ class Salida extends Model
 
     public static function getNextCode(): string
     {
+        
         $lastSalida = static::orderBy('id', 'desc')->first();
 
+        $year = date('Y');
         if (! $lastSalida) {
             $number = 1;
         } else {
             $number = (int) str_replace('SA', '', $lastSalida->id) + 1;
         }
 
-        return 'SA'.str_pad($number, 5, '0', STR_PAD_LEFT);
+        return 'SA-'.$year.'-'.str_pad($number, 5, '0', STR_PAD_LEFT);
     }
 }

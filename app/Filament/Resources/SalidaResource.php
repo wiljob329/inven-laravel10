@@ -13,6 +13,7 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Resources\Resource;
@@ -21,6 +22,7 @@ use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Blade;
+use Random\Engine\Secure;
 
 enum Casos: string implements HasLabel
 {
@@ -45,7 +47,45 @@ class SalidaResource extends Resource
     {
         return $form
             ->schema([
-                //
+                Section::make()->schema([
+                    
+                        Toggle::make('es_cuadrilla')
+                            ->label('¿Movimiento de Cuadrilla?')
+                            ->inline(false)
+                            ->live(),
+                        Select::make('solicitantes_id')
+                            ->relationship('solicitante', 'nombre')
+                            ->searchable()
+                            ->required()
+                            ->hidden(fn (Get $get) => $get('es_cuadrilla'))
+                            ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
+                            ->createOptionForm([
+                                TextInput::make('nombre')
+                                    ->label('Nombre')
+                                    ->required(),
+                                TextInput::make('cargo')
+                                    ->label('Cargo')
+                                    ->required(),
+                                TextInput::make('gerencia')
+                                    ->label('Gerencia')
+                                    ->required(),
+                                TextInput::make('cedula')
+                                    ->label('Cedula')
+                                    ->required(),
+                            ])
+                            ->createOptionAction(function (Action $action) {
+                                return $action
+                                    ->modalHeading('Crear Solicitante')
+                                    ->modalSubmitActionLabel('Crear Solicitante')
+                                    ->modalWidth('sm');
+                            }),
+                        Select::make('cuadrilla_id')
+                            ->relationship('cuadrilla', 'nombre')
+                            ->native(false)
+                            ->required()
+                            ->visible(fn (Get $get) => $get('es_cuadrilla'))
+                            ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito')),
+                ])->columns(2),
                 Section::make()
                     ->schema([
                         TextInput::make('serial')
@@ -70,42 +110,62 @@ class SalidaResource extends Resource
                         TextInput::make('destino')
                             ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
                             ->required(),
-                        Select::make('solicitantes_id')
-                            ->relationship('solicitante', 'nombre')
-                            ->searchable()
-                            ->required()
-                            ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
-                            ->createOptionForm([
-                                TextInput::make('nombre')
-                                    ->label('Nombre')
-                                    ->required(),
-                                TextInput::make('cargo')
-                                    ->label('Cargo')
-                                    ->required(),
-                                TextInput::make('gerencia')
-                                    ->label('Gerencia')
-                                    ->required(),
-                                TextInput::make('cedula')
-                                    ->label('Cedula')
-                                    ->required(),
-                            ])
-                            ->createOptionAction(function (Action $action) {
-                                return $action
-                                    ->modalHeading('Crear Solicitante')
-                                    ->modalSubmitActionLabel('Crear Solicitante')
-                                    ->modalWidth('sm');
-                            }),
+                        // Toggle::make('es_cuadrilla')
+                        //     ->label('¿Movimiento de Cuadrilla?')
+                        //     ->inline(false)
+                        //     ->live()
+                        //     // ->afterStateHydrated(function (Toggle $component, $state, $record) {
+                        //     //     if ($record) {
+                        //     //         $component->state($record->cuadrilla_id !== null);
+                        //     //     }
+                        //     // })
+                        //     ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito')),
+                        // Select::make('solicitantes_id')
+                        //     ->relationship('solicitante', 'nombre')
+                        //     ->searchable()
+                        //     ->required()
+                        //     ->hidden(fn (Get $get) => $get('es_cuadrilla'))
+                        //     ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
+                        //     ->createOptionForm([
+                        //         TextInput::make('nombre')
+                        //             ->label('Nombre')
+                        //             ->required(),
+                        //         TextInput::make('cargo')
+                        //             ->label('Cargo')
+                        //             ->required(),
+                        //         TextInput::make('gerencia')
+                        //             ->label('Gerencia')
+                        //             ->required(),
+                        //         TextInput::make('cedula')
+                        //             ->label('Cedula')
+                        //             ->required(),
+                        //     ])
+                        //     ->createOptionAction(function (Action $action) {
+                        //         return $action
+                        //             ->modalHeading('Crear Solicitante')
+                        //             ->modalSubmitActionLabel('Crear Solicitante')
+                        //             ->modalWidth('sm');
+                        //     }),
+                        // Select::make('cuadrilla_id')
+                        //     ->relationship('cuadrilla', 'nombre')
+                        //     ->native(false)
+                        //     ->required()
+                        //     ->visible(fn (Get $get) => $get('es_cuadrilla'))
+                        //     ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito')),
                         Select::make('vehiculos_id')
                             ->relationship('vehiculo', 'placa')
                             ->searchable()
                             ->required()
                             ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
                             ->createOptionForm([
-                                TextInput::make('tipo')
-                                    ->label('Tipo Vehiculo')
-                                    ->required(),
                                 TextInput::make('placa')
                                     ->label('Placa')
+                                    ->required(),
+                                TextInput::make('modelo')
+                                    ->label('Modelo')
+                                    ->required(),
+                                TextInput::make('descripcion')
+                                    ->label('Descripcion')
                                     ->required(),
                             ])
                             ->createOptionAction(function (Action $action) {
@@ -131,7 +191,7 @@ class SalidaResource extends Resource
                             ->live()
                             ->hidden(fn (Get $get) => $get('caso') != '1x10'),
 
-                    ])->columns(3),
+                    ])->columns(2),
                 Section::make('Seleccion de materiales')
                     ->schema([
                         Repeater::make('articulos')
@@ -164,14 +224,31 @@ class SalidaResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('serial'),
-                TextColumn::make('fecha')->date()->toggleable(),
-                TextColumn::make('solicitante.nombre')->searchable(),
-                TextColumn::make('destino')->toggleable(),
-                TextColumn::make('solicitante.cedula')->label('Cedula Solicitante')->toggleable(),
-                TextColumn::make('vehiculo.placa')->toggleable(),
-                TextColumn::make('caso')->toggleable(),
-                TextColumn::make('codigo_uxd')->toggleable(),
-
+                TextColumn::make('fecha')
+                    ->searchable()
+                    ->date('d/m/Y')
+                    ->toggleable(),
+                TextColumn::make('solicitante.nombre')
+                    ->searchable()
+                    ->label('Solicitante'),
+                TextColumn::make('destino')
+                    ->searchable()
+                    ->toggleable(),
+                TextColumn::make('solicitante.cedula')
+                    ->label('Cedula Solicitante')
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('cuadrilla.nombre')
+                    ->label('Cuadrilla')
+                    ->searchable()
+                    ->toggleable(),
+                TextColumn::make('vehiculo.placa')
+                    ->toggleable(),
+                TextColumn::make('caso')
+                    ->toggleable(),
+                TextColumn::make('codigo_uxd')
+                    ->label('Codigo 1X10')
+                    ->searchable()
+                    ->toggleable(),
             ])
             ->filters([
                 //
