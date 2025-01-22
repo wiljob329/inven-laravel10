@@ -5,25 +5,31 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Traits\Auditable;
+use Illuminate\Support\Facades\DB;
 
 class Entrada extends Model
 {
     use HasFactory;
     use Auditable;
 
-    protected $fillable = ['codigo_nota_entrega', 'fecha', 'encargado_id', 'proveedors_id', 'cuadrilla_id'];
+    protected $fillable = ['codigo_nota_entrega', 'fecha', 'encargado_id', 'proveedors_id', 'cuadrilla_id', 'es_cuadrilla'];
+
+    protected $casts = [
+        'es_cuadrilla' => 'boolean',
+    ];
 
     public static function getNextCode(): string
     {
-        $lastEntrada = static::orderBy('id', 'desc')->first();
-
+        $lastEntrada = DB::table('entradas')->count();
+        $before = 'EN-'.date('Y');
         if (! $lastEntrada) {
             $number = 1;
         } else {
-            $number = (int) str_replace('INV', '', $lastEntrada->codigo_nota_entrega) + 1;
+            // $number = (int) str_replace('SA', '', $lastSalida->id) + 1;
+            $number = $lastEntrada + 1;
         }
 
-        return 'INV'.str_pad($number, 5, '0', STR_PAD_LEFT);
+        return $before.str_pad($number, 5, '0', STR_PAD_LEFT);
     }
 
     public function encargado()

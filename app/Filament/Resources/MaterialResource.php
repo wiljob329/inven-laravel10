@@ -34,10 +34,10 @@ class MaterialResource extends Resource
                         Section::make()
                             ->schema([
                                 TextInput::make('descripcion')
-                                    ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
+                                    ->disabled(fn (string $operation) => $operation == 'edit' && !auth()->user()->hasRole('super_admin'))
                                     ->required(),
                                 Select::make('unidad_medidas_id')
-                                    ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
+                                    ->disabled(fn (string $operation) => $operation == 'edit' && !auth()->user()->hasRole('super_admin'))
                                     ->label('Unidad de Medidas')
                                     ->relationship('unidad_medidas', 'unidad')
                                     ->searchable()
@@ -54,10 +54,10 @@ class MaterialResource extends Resource
                                             ->modalWidth('sm');
                                     }),
                                 TextInput::make('cantidad')
-                                    ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
+                                    ->disabled(fn (string $operation) => $operation == 'edit' && !auth()->user()->hasRole('super_admin'))
                                     ->numeric(),
                                 Select::make('depositos_id')
-                                    ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
+                                    ->disabled(fn (string $operation) => $operation == 'edit' && !auth()->user()->hasRole('super_admin'))
                                     ->relationship('deposito', 'name')
                                     ->searchable()
                                     ->required()
@@ -73,7 +73,7 @@ class MaterialResource extends Resource
                                             ->modalWidth('sm');
                                     }),
                                 Select::make('categorias_id')
-                                    ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
+                                    ->disabled(fn (string $operation) => $operation == 'edit' && !auth()->user()->hasRole('super_admin'))
                                     ->relationship('categoria', 'name')
                                     ->searchable()
                                     ->required()
@@ -89,11 +89,12 @@ class MaterialResource extends Resource
                                             ->modalWidth('sm');
                                     }),
                                 TextInput::make('alerta')
-                                    ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
+                                    ->disabled(fn (string $operation) => $operation == 'edit' && !auth()->user()->hasRole('super_admin'))
                                     ->label('Numero minimo permitido')
                                     ->required()
                                     ->numeric(),
                                 Toggle::make('activo')
+                                    ->disabled(fn (string $operation) => $operation == 'edit' && !auth()->user()->hasRole('super_admin'))
                                     ->onColor('success')
                                     ->offColor('danger'),
 

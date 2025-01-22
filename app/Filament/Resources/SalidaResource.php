@@ -48,17 +48,18 @@ class SalidaResource extends Resource
         return $form
             ->schema([
                 Section::make()->schema([
-                    
                         Toggle::make('es_cuadrilla')
+                            ->disabled(fn (string $operation) => $operation == 'edit' && !auth()->user()->hasRole('super_admin'))
                             ->label('¿Movimiento de Cuadrilla?')
+                            ->onColor('success')
+                            ->offColor('danger')
                             ->inline(false)
                             ->live(),
                         Select::make('solicitantes_id')
                             ->relationship('solicitante', 'nombre')
                             ->searchable()
-                            ->required()
                             ->hidden(fn (Get $get) => $get('es_cuadrilla'))
-                            ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
+                            ->disabled(fn (string $operation) => $operation == 'edit' && !auth()->user()->hasRole('super_admin'))
                             ->createOptionForm([
                                 TextInput::make('nombre')
                                     ->label('Nombre')
@@ -84,7 +85,7 @@ class SalidaResource extends Resource
                             ->native(false)
                             ->required()
                             ->visible(fn (Get $get) => $get('es_cuadrilla'))
-                            ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito')),
+                            ->disabled(fn (string $operation) => $operation == 'edit' && !auth()->user()->hasRole('super_admin')),
                 ])->columns(2),
                 Section::make()
                     ->schema([
@@ -101,62 +102,20 @@ class SalidaResource extends Resource
                             ->disabled()
                             ->dehydrated(),
                         DatePicker::make('fecha')
-                            ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
+                            ->disabled(fn (string $operation) => $operation == 'edit' && !auth()->user()->hasRole('super_admin'))
                             ->required()
                             ->native(false)
                             ->suffixIcon('heroicon-o-calendar')
                             ->closeOnDateSelection()
                             ->displayFormat('d/m/Y'),
                         TextInput::make('destino')
-                            ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
+                            ->disabled(fn (string $operation) => $operation == 'edit' && !auth()->user()->hasRole('super_admin'))
                             ->required(),
-                        // Toggle::make('es_cuadrilla')
-                        //     ->label('¿Movimiento de Cuadrilla?')
-                        //     ->inline(false)
-                        //     ->live()
-                        //     // ->afterStateHydrated(function (Toggle $component, $state, $record) {
-                        //     //     if ($record) {
-                        //     //         $component->state($record->cuadrilla_id !== null);
-                        //     //     }
-                        //     // })
-                        //     ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito')),
-                        // Select::make('solicitantes_id')
-                        //     ->relationship('solicitante', 'nombre')
-                        //     ->searchable()
-                        //     ->required()
-                        //     ->hidden(fn (Get $get) => $get('es_cuadrilla'))
-                        //     ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
-                        //     ->createOptionForm([
-                        //         TextInput::make('nombre')
-                        //             ->label('Nombre')
-                        //             ->required(),
-                        //         TextInput::make('cargo')
-                        //             ->label('Cargo')
-                        //             ->required(),
-                        //         TextInput::make('gerencia')
-                        //             ->label('Gerencia')
-                        //             ->required(),
-                        //         TextInput::make('cedula')
-                        //             ->label('Cedula')
-                        //             ->required(),
-                        //     ])
-                        //     ->createOptionAction(function (Action $action) {
-                        //         return $action
-                        //             ->modalHeading('Crear Solicitante')
-                        //             ->modalSubmitActionLabel('Crear Solicitante')
-                        //             ->modalWidth('sm');
-                        //     }),
-                        // Select::make('cuadrilla_id')
-                        //     ->relationship('cuadrilla', 'nombre')
-                        //     ->native(false)
-                        //     ->required()
-                        //     ->visible(fn (Get $get) => $get('es_cuadrilla'))
-                        //     ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito')),
                         Select::make('vehiculos_id')
                             ->relationship('vehiculo', 'placa')
                             ->searchable()
                             ->required()
-                            ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
+                            ->disabled(fn (string $operation) => $operation == 'edit' && !auth()->user()->hasRole('super_admin'))
                             ->createOptionForm([
                                 TextInput::make('placa')
                                     ->label('Placa')
@@ -175,18 +134,18 @@ class SalidaResource extends Resource
                                     ->modalWidth('sm');
                             }),
                         Select::make('caso')
-                            ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
+                            ->disabled(fn (string $operation) => $operation == 'edit' && !auth()->user()->hasRole('super_admin'))
                             ->native(false)
                             ->live()
                             ->options(Casos::class),
                         Select::make('jefe_id')
                             ->label('Aprobado por')
-                            ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
+                            ->disabled(fn (string $operation) => $operation == 'edit' && !auth()->user()->hasRole('super_admin'))
                             ->native(false)
                             ->live()
                             ->options(Jefe::all()->pluck('nombre', 'id')),
                         TextInput::make('codigo_uxd')
-                            ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
+                            ->disabled(fn (string $operation) => $operation == 'edit' && !auth()->user()->hasRole('super_admin'))
                             ->label('Codigo uno x 10')
                             ->live()
                             ->hidden(fn (Get $get) => $get('caso') != '1x10'),
@@ -196,17 +155,17 @@ class SalidaResource extends Resource
                     ->schema([
                         Repeater::make('articulos')
                             ->label('')
-                            ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
+                            ->disabled(fn (string $operation) => $operation == 'edit' && !auth()->user()->hasRole('super_admin'))
                             ->relationship('articulos')
                             ->schema([
                                 Select::make('material_id')
-                                    ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
+                                    ->disabled(fn (string $operation) => $operation == 'edit' && !auth()->user()->hasRole('super_admin'))
                                     ->relationship('material', 'descripcion')
                                     ->searchable()
                                     ->suffix(fn (Get $get) => Material::find($get('material_id'))->unidad_medidas->unidad ?? '')
                                     ->required(),
                                 TextInput::make('cantidad')
-                                    ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
+                                    ->disabled(fn (string $operation) => $operation == 'edit' && !auth()->user()->hasRole('super_admin'))
                                     ->numeric()
                                     ->required()
                                     ->minValue(1),

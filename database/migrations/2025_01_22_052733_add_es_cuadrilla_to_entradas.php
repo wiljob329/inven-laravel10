@@ -6,16 +6,22 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /**
+     * Run the migrations.
+     */
     public function up(): void
     {
-        Schema::table('salidas', function (Blueprint $table) {
-            $table->boolean('es_cuadrilla')->nullable()->default(false)->after('destino');
+        Schema::table('entradas', function (Blueprint $table) {
+            $table->boolean('es_cuadrilla')->nullable()->default(false)->after('proveedors_id');
         });
     }
 
+    /**
+     * Reverse the migrations.
+     */
     public function down(): void
     {
-        Schema::table('salidas', function (Blueprint $table) {
+        Schema::table('entradas', function (Blueprint $table) {
             $table->dropColumn('es_cuadrilla');
         });
     }

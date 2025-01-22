@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Traits\Auditable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class Salida extends Model
 {
@@ -62,15 +63,15 @@ class Salida extends Model
     public static function getNextCode(): string
     {
         
-        $lastSalida = static::orderBy('id', 'desc')->first();
-
-        $year = date('Y');
+        $lastSalida = DB::table('salidas')->count();
+        $before = 'SA-'.date('Y');
         if (! $lastSalida) {
             $number = 1;
         } else {
-            $number = (int) str_replace('SA', '', $lastSalida->id) + 1;
+            // $number = (int) str_replace('SA', '', $lastSalida->id) + 1;
+            $number = $lastSalida + 1;
         }
 
-        return 'SA-'.$year.'-'.str_pad($number, 5, '0', STR_PAD_LEFT);
+        return $before.str_pad($number, 5, '0', STR_PAD_LEFT);
     }
 }

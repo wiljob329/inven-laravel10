@@ -45,29 +45,18 @@ class EntradaResource extends Resource
             ->schema([
                 Section::make()
                     ->schema([
-                        TextInput::make('codigo_nota_entrega')
-                            ->default(fn () => Entrada::getNextCode())
-                            ->disabled()
-                            ->dehydrated()
-                            ->label('Codigo de entrega')
-                            ->required(),
-                        DatePicker::make('fecha')
-                            ->required()
-                            ->native(false)
-                            ->suffixIcon('heroicon-o-calendar')
-                            ->closeOnDateSelection()
-                            ->displayFormat('d/m/Y')
-                            ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito')),
-                        Select::make('encargado_id')
-                            ->label('Encargado')
-                            ->options([auth()->user()->id => auth()->user()->name])
-                            ->default(auth()->user()->id)
-                            ->disabled()
-                            ->dehydrated(),
+                        Toggle::make('es_cuadrilla')
+                            ->disabled(fn (string $operation) => $operation == 'edit' && !auth()->user()->hasRole('super_admin'))
+                            ->label('¿Movimiento de Cuadrilla?')
+                            ->inline(false)
+                            ->onColor('success')
+                            ->offColor('danger')
+                            ->live(),
                         Select::make('proveedors_id')
-                            ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
+                            ->disabled(fn (string $operation) => $operation == 'edit' && !auth()->user()->hasRole('super_admin'))
                             ->relationship('proveedor', 'name')
                             ->searchable()
+                            ->hidden(fn (Get $get) => $get('es_cuadrilla'))
                             //->required()
                             ->createOptionForm([
                                 TextInput::make('name')
@@ -83,31 +72,41 @@ class EntradaResource extends Resource
                                     ->modalSubmitActionLabel('Crear Proveedor')
                                     ->modalWidth('sm');
                             }),
-                        Toggle::make('cuadrilla')
-                            ->label('Movimiento de cuadrilla')
-                            ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
-                            ->onColor('success')
-                            ->offColor('danger')
-                            ->inline(false)
-                            ->afterStateHydrated(function (Toggle $component, $state, $record) {
-                                if ($record) {
-                                    $component->state($record->cuadrilla_id !== null);
-                                }
-                            })
-                            ->live(),
                         Select::make('cuadrilla_id')
                             ->label('Cuadrillas')
+                            ->disabled(fn (string $operation) => $operation == 'edit' && !auth()->user()->hasRole('super_admin'))
+                            ->visible(fn (Get $get) => $get('es_cuadrilla'))
                             ->native(false)
-                            ->hidden(fn (Get $get) => $get('cuadrilla') == false)
                             ->options(Cuadrilla::all()->pluck('nombre', 'id')),
-
+                    ])->columns(2),
+                Section::make()
+                    ->schema([
+                        TextInput::make('codigo_nota_entrega')
+                            ->default(fn () => Entrada::getNextCode())
+                            ->disabled()
+                            ->dehydrated()
+                            ->label('Codigo de entrega')
+                            ->required(),
+                        DatePicker::make('fecha')
+                            ->required()
+                            ->native(false)
+                            ->suffixIcon('heroicon-o-calendar')
+                            ->closeOnDateSelection()
+                            ->displayFormat('d/m/Y')
+                            ->disabled(fn (string $operation) => $operation == 'edit' && !auth()->user()->hasRole('super_admin')),
+                        Select::make('encargado_id')
+                            ->label('Encargado')
+                            ->options([auth()->user()->id => auth()->user()->name])
+                            ->default(auth()->user()->id)
+                            ->disabled()
+                            ->dehydrated(),
                     ])->columns(4),
 
                 Section::make('Seleccion de materiales')
                     ->schema([
 
                         Repeater::make('articulos')
-                            ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
+                            ->disabled(fn (string $operation) => $operation == 'edit' && !auth()->user()->hasRole('super_admin'))
                             ->label('')
                             ->relationship('articulos')
                             ->schema([
@@ -164,7 +163,7 @@ class EntradaResource extends Resource
                                             ->modalWidth('sm');
                                     }),
                                 TextInput::make('cantidad')
-                                    ->disabled(fn (string $operation) => $operation == 'edit' && auth()->user()->hasRole('deposito'))
+                                    ->disabled(fn (string $operation) => $operation == 'edit' && !auth()->user()->hasRole('super_admin'))
                                     ->numeric()
                                     ->required()
                                     ->minValue(1)
@@ -190,6 +189,7 @@ class EntradaResource extends Resource
                 TextColumn::make('fecha')->date('d/m/Y'),
                 TextColumn::make('encargado.name'),
                 TextColumn::make('proveedor.name'),
+                TextColumn::make('cuadrilla.nombre'),
 
             ])
             ->defaultSort('fecha', 'desc')
