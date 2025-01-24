@@ -98,7 +98,7 @@
             {{--
                 <td colspan="2" class="wobl">CASO:
                     @if ($record->caso == '1x10')
-                        {{ $record->caso }} {{ $record->codigo_uxd }}
+                      {{ $record->caso }} {{ $record->codigo_uxd }}
                     @else
                         {{ $record->caso }}
                     @endif

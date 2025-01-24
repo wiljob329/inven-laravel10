@@ -15,7 +15,7 @@ class AuditoriaPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_auditoria');
+        return $user->hasRole('super_admin');
     }
 
     /**
@@ -23,7 +23,7 @@ class AuditoriaPolicy
      */
     public function view(User $user, Auditoria $auditoria): bool
     {
-        return $user->can('view_auditoria');
+        return $user->hasRole('super_admin');
     }
 
     /**
@@ -31,7 +31,7 @@ class AuditoriaPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_auditoria');
+        return false;
     }
 
     /**
@@ -39,7 +39,7 @@ class AuditoriaPolicy
      */
     public function update(User $user, Auditoria $auditoria): bool
     {
-        return $user->can('update_auditoria');
+        return false;
     }
 
     /**
@@ -47,7 +47,7 @@ class AuditoriaPolicy
      */
     public function delete(User $user, Auditoria $auditoria): bool
     {
-        return $user->can('delete_auditoria');
+        return false;
     }
 
     /**
@@ -63,7 +63,7 @@ class AuditoriaPolicy
      */
     public function forceDelete(User $user, Auditoria $auditoria): bool
     {
-        return $user->can('force_delete_auditoria');
+        return false;
     }
 
     /**
@@ -79,7 +79,7 @@ class AuditoriaPolicy
      */
     public function restore(User $user, Auditoria $auditoria): bool
     {
-        return $user->can('restore_auditoria');
+        return false;
     }
 
     /**

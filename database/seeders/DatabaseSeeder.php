@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             ShieldSeeder::class,
             JefeSeeder::class,
             CuadrillaSeeder::class,
+            MunicipioSeeder::class,
         ]);
         // \App\Models\User::factory()->create([
         //     'name' => 'Test User',

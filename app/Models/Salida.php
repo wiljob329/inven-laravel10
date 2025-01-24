@@ -24,6 +24,7 @@ class Salida extends Model
         'jefe_id',
         'cuadrilla_id',
         'es_cuadrilla',
+        'municipio_id'
     ];
 
     protected $casts = [
@@ -58,6 +59,11 @@ class Salida extends Model
     public function cuadrilla()
     {
         return $this->belongsTo(Cuadrilla::class, 'cuadrilla_id');
+    }
+
+    public function municipio()
+    {
+        return $this->belongsTo(Municipio::class, 'municipio_id');
     }
 
     public static function getNextCode(): string

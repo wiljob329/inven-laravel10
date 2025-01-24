@@ -13,16 +13,19 @@ class EditEntrada extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            // Actions\DeleteAction::make(),
+            Actions\DeleteAction::make(),
         ];
     }
 
-    // public function mount(int|string $record): void
-    // {
-    //     parent::mount($record);
-    //     dd($this->record->toArray());
-    //     //
-    //     // dd($this->record->cuadrilla_id);
-    //     // dd($this->form->getState()['cuadrilla_id']);
-    // }
+    protected function getSaveFormAction(): Actions\Action
+    {
+        return parent::getSaveFormAction()
+            ->disabled(!auth()->user()->hasRole('super_admin'))
+            ->hidden(!auth()->user()->hasRole('super_admin'));
+    }
+
+    protected function mutateFormDataBeforeSave(array $data): array
+    {
+        return $data;
+    }
 }

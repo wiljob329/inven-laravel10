@@ -109,6 +109,10 @@ class MaterialResource extends Resource
     {
         return $table
             ->columns([
+                TextColumn::make('id')
+                    ->label('Codigo')
+                    ->searchable()
+                    ->toggleable(),
                 TextColumn::make('descripcion')->searchable()->toggleable(),
                 TextColumn::make('unidad_medidas.unidad')->searchable()->toggleable(),
                 TextColumn::make('cantidad')->toggleable()->searchable(),

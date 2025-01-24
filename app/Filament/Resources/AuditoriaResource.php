@@ -26,7 +26,15 @@ class AuditoriaResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
+        if (!auth()->user()->hasRole('super_admin')) {
+            return null;
+        }
         return static::getModel()::count();
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return auth()->user()->hasRole('super_admin');
     }
 
     public static function table(Table $table): Table
@@ -57,6 +65,7 @@ class AuditoriaResource extends Resource
                     ->searchable()
                     ->wrap(),
                 TextColumn::make('created_at')
+                    ->searchable()
                     ->label('Fecha')
                     ->dateTime('d/m/Y H:i:s')
                     ->sortable(),
@@ -105,11 +114,11 @@ class AuditoriaResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return true; // El acceso será controlado por Shield
+        return auth()->user()->hasRole('super_admin');
     }
 
     public static function canView(Model $record): bool
     {
-        return true; // El acceso será controlado por Shield
+        return auth()->user()->hasRole('super_admin');
     }
 }

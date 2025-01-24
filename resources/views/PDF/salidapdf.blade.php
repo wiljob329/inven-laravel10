@@ -109,9 +109,13 @@
             </td>
         </tr>
         <tr>
-            <td colspan="3" class="wobt">SOLICITANTE: {{ $record->solicitante->nombre }}</td>
-            <td colspan="2" class="wobt wobl">CI: {{ $record->solicitante->cedula }}</td>
-            <td colspan="5" class="wobl wobt">CARGO: {{ $record->solicitante->cargo }}</td>
+            @if ($record->solicitante)
+                <td colspan="3" class="wobt">SOLICITANTE: {{ $record->solicitante->nombre }}</td>
+                <td colspan="2" class="wobt wobl">CI: {{ $record->solicitante->cedula }}</td>
+                <td colspan="5" class="wobl wobt">CARGO: {{ $record->solicitante->cargo }}</td>
+            @else
+                <td colspan="10" class="wobt">CUADRILLA: {{ $record->cuadrilla->nombre }}</td>
+            @endif
         </tr>
         <tr>
             <td colspan="5" class="wobt">DESTINO: {{ $record->destino }} </td>
@@ -246,10 +250,14 @@
                 C.I: <span style="font-width: bold">{{ $record->jefe->cedula }}</span>
             </td>
             <td colspan="3" class="wobt wobl">
-                Nombre: <span style="font-width: bold">{{ $record->solicitante->nombre }}</span><br />
-                Cargo: <span style="font-width: bold">{{ $record->solicitante->cargo }} -
-                    {{ $record->solicitante->gerencia }}</span><br />
-                C.I: <span style="font-width: bold">{{ $record->solicitante->cedula }}</span>
+                @if ($record->solicitante)
+                    Nombre: <span style="font-width: bold">{{ $record->solicitante->nombre }}</span><br />
+                    Cargo: <span style="font-width: bold">{{ $record->solicitante->cargo }} -
+                        {{ $record->solicitante->gerencia }}</span><br />
+                    C.I: <span style="font-width: bold">{{ $record->solicitante->cedula }}</span>
+                @else
+                    Cuadrilla: <span style="font-width: bold">{{ $record->cuadrilla->nombre }}</span><br />
+                @endif
             </td>
         </tr>
 

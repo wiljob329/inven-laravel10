@@ -211,7 +211,7 @@ class EntradaResource extends Resource
                                     )
                                         ->setPaper('A4', 'landscape')
                                         ->download();
-                                }, $record->codigo_nota_entrega.now()->format('YmdHis').'.pdf');
+                                }, 'EN-'.now()->format('YmdHis').'.pdf');
                         }),
                 ]),
             ])

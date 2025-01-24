@@ -111,6 +111,11 @@ class SalidaResource extends Resource
                         TextInput::make('destino')
                             ->disabled(fn (string $operation) => $operation == 'edit' && !auth()->user()->hasRole('super_admin'))
                             ->required(),
+                        Select::make('municipio_id')
+                            ->relationship('municipio', 'nombre')
+                            ->searchable()
+                            ->required()
+                            ->disabled(fn (string $operation) => $operation == 'edit' && !auth()->user()->hasRole('super_admin')),
                         Select::make('vehiculos_id')
                             ->relationship('vehiculo', 'placa')
                             ->searchable()
@@ -193,6 +198,9 @@ class SalidaResource extends Resource
                 TextColumn::make('destino')
                     ->searchable()
                     ->toggleable(),
+                TextColumn::make('municipio.nombre')
+                    ->searchable()
+                    ->toggleable(),
                 TextColumn::make('solicitante.cedula')
                     ->label('Cedula Solicitante')
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -209,6 +217,7 @@ class SalidaResource extends Resource
                     ->searchable()
                     ->toggleable(),
             ])
+            ->defaultSort('fecha', 'desc')
             ->filters([
                 //
             ])
@@ -227,7 +236,7 @@ class SalidaResource extends Resource
                                     )
                                         ->setPaper('A4', 'landscape')
                                         ->download();
-                                }, $record->serial.now()->format('YmdHis').'.pdf');
+                                }, 'SA-'.now()->format('YmdHis').'.pdf');
                         }),
                 ]),
             ])
